@@ -1,6 +1,6 @@
 // Seed env vars before any module that imports `@/lib/config/env`
 // (which validates `process.env` at import time and throws on missing keys).
-process.env.NODE_ENV ??= "test";
+// NODE_ENV is set by vitest and has a schema default, so it's omitted here.
 process.env.DATABASE_URL ??= "postgresql://test:test@localhost:5432/test";
 process.env.NEXTAUTH_SECRET ??= "test-secret-at-least-32-characters-long!!";
 process.env.NEXTAUTH_URL ??= "http://localhost:3000";

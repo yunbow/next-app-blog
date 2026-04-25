@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useNotificationStream } from "@/features/notification/hooks/useNotificationStream";
 import { getImageUrl } from "@/lib/utils/image-url";
 import {
@@ -36,6 +36,24 @@ type NavItem = {
   authRequired?: boolean;
 };
 
+const SIDEBAR_COLLAPSED_KEY = "sidebar-collapsed";
+const SIDEBAR_EVENT = "sidebar-collapsed-change";
+
+const subscribeCollapsed = (callback: () => void) => {
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === SIDEBAR_COLLAPSED_KEY) callback();
+  };
+  window.addEventListener("storage", onStorage);
+  window.addEventListener(SIDEBAR_EVENT, callback);
+  return () => {
+    window.removeEventListener("storage", onStorage);
+    window.removeEventListener(SIDEBAR_EVENT, callback);
+  };
+};
+
+const getCollapsed = () => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true";
+const getServerCollapsed = () => false;
+
 const getNavItems = (userId?: string): NavItem[] => [
   { labelKey: "dashboard", href: "/dashboard", icon: <DashboardIcon />, authRequired: true },
   { labelKey: "search", href: "/search", icon: <SearchIcon /> },
@@ -51,16 +69,7 @@ export function Sidebar() {
   const { data: session } = useSession();
   const { t } = useTranslations();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('sidebar-collapsed');
-      if (saved === 'true') {
-        setIsCollapsed(true);
-      }
-    }
-  }, []);
+  const isCollapsed = useSyncExternalStore(subscribeCollapsed, getCollapsed, getServerCollapsed);
 
   const { unreadCount: unreadNotificationCount } = useNotificationStream();
 
@@ -94,11 +103,8 @@ export function Sidebar() {
           variant="ghost"
           size="icon"
           onClick={() => {
-            const newState = !isCollapsed;
-            setIsCollapsed(newState);
-            if (typeof window !== 'undefined') {
-              localStorage.setItem('sidebar-collapsed', String(newState));
-            }
+            localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(!isCollapsed));
+            window.dispatchEvent(new Event(SIDEBAR_EVENT));
           }}
           className={cn(isCollapsed && "mx-auto")}
           title={isCollapsed ? t("nav.expand") : t("nav.collapse")}

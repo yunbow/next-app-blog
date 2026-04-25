@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter, ArrowUpDown } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 type Props = {
   categories?: { id: string; name: string; slug: string }[];
@@ -15,11 +15,14 @@ type Props = {
 export function ArticleFilters({ categories = [], showCategoryFilter = true, basePath }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [search, setSearch] = useState(searchParams.get("q") || "");
+  const urlQ = searchParams.get("q") || "";
+  const [search, setSearch] = useState(urlQ);
+  const [prevUrlQ, setPrevUrlQ] = useState(urlQ);
 
-  useEffect(() => {
-    setSearch(searchParams.get("q") || "");
-  }, [searchParams]);
+  if (prevUrlQ !== urlQ) {
+    setPrevUrlQ(urlQ);
+    setSearch(urlQ);
+  }
 
   const updateFilters = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());

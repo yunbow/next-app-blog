@@ -1,33 +1,43 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/lib/i18n";
 
 const COOKIE_CONSENT_KEY = "cookie-consent";
+const CONSENT_EVENT = "cookie-consent-change";
+
+const subscribeConsent = (callback: () => void) => {
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === COOKIE_CONSENT_KEY) callback();
+  };
+  window.addEventListener("storage", onStorage);
+  window.addEventListener(CONSENT_EVENT, callback);
+  return () => {
+    window.removeEventListener("storage", onStorage);
+    window.removeEventListener(CONSENT_EVENT, callback);
+  };
+};
+
+const getConsent = () => localStorage.getItem(COOKIE_CONSENT_KEY);
+// Match prior SSR/first-render behavior (banner hidden until consent is read).
+const getServerConsent = () => "ssr-placeholder";
 
 export function CookieConsent() {
   const { t } = useTranslations();
-  const [isVisible, setIsVisible] = useState(false);
+  const consent = useSyncExternalStore(subscribeConsent, getConsent, getServerConsent);
+  const [dismissed, setDismissed] = useState(false);
 
-  useEffect(() => {
-    const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
-    if (!consent) {
-      setIsVisible(true);
-    }
-  }, []);
-
-  const handleAccept = () => {
-    localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
-    setIsVisible(false);
+  const setConsent = (value: "accepted" | "declined") => {
+    localStorage.setItem(COOKIE_CONSENT_KEY, value);
+    window.dispatchEvent(new Event(CONSENT_EVENT));
+    setDismissed(true);
   };
 
-  const handleDecline = () => {
-    localStorage.setItem(COOKIE_CONSENT_KEY, "declined");
-    setIsVisible(false);
-  };
+  const handleAccept = () => setConsent("accepted");
+  const handleDecline = () => setConsent("declined");
 
-  if (!isVisible) {
+  if (dismissed || consent !== null) {
     return null;
   }
 

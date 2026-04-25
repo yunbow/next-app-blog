@@ -5,23 +5,28 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 function SearchForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [searchQuery, setSearchQuery] = useState("");
+  const urlQ = searchParams.get("q") ?? "";
+  const [searchQuery, setSearchQuery] = useState(urlQ);
+  const [prev, setPrev] = useState({ urlQ, pathname });
 
-  useEffect(() => {
-    const q = searchParams.get("q");
-    if (q) {
-      setSearchQuery(q);
+  // Sync the input when the URL changes (e.g. user clicks a result that
+  // updates ?q=, or navigates away from /search). Done during render via
+  // the prev-value pattern so we don't write state inside an effect.
+  if (prev.urlQ !== urlQ || prev.pathname !== pathname) {
+    setPrev({ urlQ, pathname });
+    if (urlQ) {
+      setSearchQuery(urlQ);
     } else if (pathname !== "/search") {
       setSearchQuery("");
     }
-  }, [searchParams, pathname]);
+  }
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
