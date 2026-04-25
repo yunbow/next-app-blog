@@ -121,3 +121,7 @@ npm run dev                   # http://localhost:3000
 - [`docs/usages/local-setup.md`](docs/usages/local-setup.md) — ローカル環境構築手順
 - [`docs/ai-dev-os/`](docs/ai-dev-os/) — AI Dev OS 開発ガイドライン (submodule)
 - [`CLAUDE.md`](CLAUDE.md) — Claude Code 用プロジェクト指示
+
+## ライセンス
+
+[MIT License](LICENSE) © 2026 yunbow
