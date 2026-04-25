@@ -11,15 +11,25 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     article: {
       create: vi.fn(),
+      findFirst: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
     },
+    articleVersion: {
+      findFirst: vi.fn(),
+      create: vi.fn(),
+    },
     articleImage: {
       deleteMany: vi.fn(),
+      createMany: vi.fn(),
     },
     articleTag: {
       deleteMany: vi.fn(),
+      create: vi.fn(),
+    },
+    tag: {
+      upsert: vi.fn(),
     },
   },
 }));
