@@ -101,7 +101,7 @@ jobs:
         run: npm run test:e2e
         env:
           DATABASE_URL: "file:./test.db"
-          NEXTAUTH_SECRET: "test-secret"
+          NEXTAUTH_SECRET: "test-secret-at-least-32-characters-long!!"
           NEXTAUTH_URL: "http://localhost:3000"
       
       - name: Upload Playwright Report
@@ -135,7 +135,7 @@ jobs:
         run: npm run build
         env:
           DATABASE_URL: "file:./dev.db"
-          NEXTAUTH_SECRET: "test-secret"
+          NEXTAUTH_SECRET: "test-secret-at-least-32-characters-long!!"
           NEXTAUTH_URL: "http://localhost:3000"
           NEXT_PUBLIC_APP_URL: "http://localhost:3000"
       
