@@ -1,0 +1,3 @@
+[submodule "docs/ai-dev-os"]
+	path = docs/ai-dev-os
+	url = https://github.com/yunbow/ai-dev-os-rules-typescript

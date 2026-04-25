@@ -43,6 +43,7 @@ storybook-static
 prisma/*.db
 prisma/*.db-journal
 
+/docs/ai-dev-os
 /public/uploads/
 
 # AI agents
