@@ -1,0 +1,79 @@
+import { notFound, redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { getCollectionWithBookmarks } from "@/features/bookmark/services/bookmark-service";
+import { ArticleCard } from "@/features/article/components/ArticleCard";
+import { BackLink } from "@/components/common/BackLink";
+import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/common/Pagination";
+import { DeleteCollectionButton } from "@/features/bookmark/components/DeleteCollectionButton";
+import Link from "next/link";
+import { Edit } from "lucide-react";
+
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ page?: string }>;
+};
+
+export default async function CollectionDetailPage({ params, searchParams }: Props) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+
+  const [{ id }, { page: pageParam }] = await Promise.all([params, searchParams]);
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const collection = await getCollectionWithBookmarks(id, page);
+
+  if (!collection) {
+    notFound();
+  }
+
+  if (collection.userId !== session.user.id && !collection.isPublic) {
+    redirect("/bookmarks");
+  }
+
+  const isOwner = collection.userId === session.user.id;
+  const totalPages = Math.ceil(collection._count.bookmarks / 12);
+
+  return (
+    <div className="container max-w-6xl pb-8">
+      <BackLink href="/bookmarks" label="ブックマークに戻る" />
+      <div className="flex items-start justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">{collection.name}</h1>
+          {collection.description && (
+            <p className="text-muted-foreground mt-2">{collection.description}</p>
+          )}
+          <p className="text-sm text-muted-foreground mt-2">
+            {collection._count.bookmarks}件の記事 • {collection.isPublic ? "公開" : "非公開"}
+          </p>
+        </div>
+        {isOwner && (
+          <div className="flex gap-2">
+            <Link href={`/bookmarks/collections/${id}/edit`}>
+              <Button variant="outline" size="sm">
+                <Edit className="h-4 w-4 mr-2" />
+                編集
+              </Button>
+            </Link>
+            <DeleteCollectionButton collectionId={id} />
+          </div>
+        )}
+      </div>
+
+      {collection.bookmarks.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">このコレクションにはまだ記事がありません</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {collection.bookmarks.map((bookmark) => (
+            <ArticleCard key={bookmark.id} article={bookmark.article} />
+          ))}
+        </div>
+      )}
+      <Pagination currentPage={page} totalPages={totalPages} basePath={`/bookmarks/collections/${id}`} />
+    </div>
+  );
+}

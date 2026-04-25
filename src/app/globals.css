@@ -1,0 +1,441 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@uiw/react-markdown-preview/markdown.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans), var(--font-noto-sans-jp), system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, Menlo, Monaco, Consolas, "Courier New", monospace;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(0.975 0.005 250);
+  --foreground: oklch(0.20 0.02 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.20 0.02 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.20 0.02 250);
+  --primary: oklch(0.55 0.18 250);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.01 250);
+  --secondary-foreground: oklch(0.25 0.05 250);
+  --muted: oklch(0.96 0.005 250);
+  --muted-foreground: oklch(0.55 0.02 250);
+  --accent: oklch(0.88 0.02 250);
+  --accent-foreground: oklch(0.25 0.10 250);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.90 0.01 250);
+  --input: oklch(0.87 0.01 250);
+  --ring: oklch(0.55 0.18 250);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.96 0.01 250);
+  --sidebar-foreground: oklch(0.20 0.02 250);
+  --sidebar-primary: oklch(0.55 0.18 250);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.90 0.03 250);
+  --sidebar-accent-foreground: oklch(0.25 0.10 250);
+  --sidebar-border: oklch(0.90 0.01 250);
+  --sidebar-ring: oklch(0.55 0.18 250);
+}
+
+.dark {
+  --background: oklch(0.18 0.02 250);
+  --foreground: oklch(0.96 0.008 250);
+  --card: oklch(0.23 0.02 250);
+  --card-foreground: oklch(0.96 0.008 250);
+  --popover: oklch(0.23 0.02 250);
+  --popover-foreground: oklch(0.96 0.008 250);
+  --primary: oklch(0.70 0.15 250);
+  --primary-foreground: oklch(0.15 0.02 250);
+  --secondary: oklch(0.28 0.02 250);
+  --secondary-foreground: oklch(0.96 0.008 250);
+  --muted: oklch(0.28 0.02 250);
+  --muted-foreground: oklch(0.70 0.01 250);
+  --accent: oklch(0.30 0.08 250);
+  --accent-foreground: oklch(0.96 0.008 250);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.70 0.15 250);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.22 0.02 250);
+  --sidebar-foreground: oklch(0.96 0.008 250);
+  --sidebar-primary: oklch(0.70 0.15 250);
+  --sidebar-primary-foreground: oklch(0.15 0.02 250);
+  --sidebar-accent: oklch(0.30 0.08 250);
+  --sidebar-accent-foreground: oklch(0.96 0.008 250);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.70 0.15 250);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Markdown Preview Theme Integration */
+.wmde-markdown {
+  background-color: transparent !important;
+  color: var(--foreground) !important;
+  font-family: inherit !important;
+}
+
+.wmde-markdown h1,
+.wmde-markdown h2,
+.wmde-markdown h3,
+.wmde-markdown h4,
+.wmde-markdown h5,
+.wmde-markdown h6 {
+  color: var(--foreground) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+.wmde-markdown a {
+  color: var(--primary) !important;
+}
+
+.wmde-markdown a:hover {
+  opacity: 0.8;
+}
+
+.wmde-markdown code {
+  background-color: var(--muted) !important;
+  color: var(--foreground) !important;
+  border-radius: 0.25rem;
+  padding: 0.2em 0.4em;
+  font-size: 0.875em;
+}
+
+/* コードブロックのスタイル - GitHub風 */
+.wmde-markdown pre {
+  background-color: var(--muted) !important;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.wmde-markdown pre code {
+  background-color: transparent !important;
+  color: var(--foreground) !important;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  padding: 0;
+}
+
+/* シンタックスハイライトのカラー - GitHub Light */
+.wmde-markdown pre code .hljs-comment,
+.wmde-markdown pre code .hljs-quote {
+  color: #6a737d;
+  font-style: italic;
+}
+
+.wmde-markdown pre code .hljs-keyword,
+.wmde-markdown pre code .hljs-selector-tag,
+.wmde-markdown pre code .hljs-subst {
+  color: #d73a49;
+}
+
+.wmde-markdown pre code .hljs-number,
+.wmde-markdown pre code .hljs-literal,
+.wmde-markdown pre code .hljs-variable,
+.wmde-markdown pre code .hljs-template-variable {
+  color: #005cc5;
+}
+
+.wmde-markdown pre code .hljs-string,
+.wmde-markdown pre code .hljs-doctag {
+  color: #032f62;
+}
+
+.wmde-markdown pre code .hljs-title,
+.wmde-markdown pre code .hljs-section,
+.wmde-markdown pre code .hljs-selector-id {
+  color: #6f42c1;
+  font-weight: 600;
+}
+
+.wmde-markdown pre code .hljs-type,
+.wmde-markdown pre code .hljs-class .hljs-title {
+  color: #005cc5;
+  font-weight: 600;
+}
+
+.wmde-markdown pre code .hljs-tag,
+.wmde-markdown pre code .hljs-name,
+.wmde-markdown pre code .hljs-attribute {
+  color: #22863a;
+}
+
+.wmde-markdown pre code .hljs-regexp,
+.wmde-markdown pre code .hljs-link {
+  color: #032f62;
+}
+
+.wmde-markdown pre code .hljs-symbol,
+.wmde-markdown pre code .hljs-bullet {
+  color: #e36209;
+}
+
+.wmde-markdown pre code .hljs-built_in,
+.wmde-markdown pre code .hljs-builtin-name {
+  color: #005cc5;
+}
+
+.wmde-markdown pre code .hljs-meta {
+  color: #6a737d;
+}
+
+.wmde-markdown pre code .hljs-deletion {
+  background-color: #ffeef0;
+  color: #b31d28;
+}
+
+.wmde-markdown pre code .hljs-addition {
+  background-color: #e6ffed;
+  color: #22863a;
+}
+
+.wmde-markdown pre code .hljs-emphasis {
+  font-style: italic;
+}
+
+.wmde-markdown pre code .hljs-strong {
+  font-weight: 700;
+}
+
+.wmde-markdown table {
+  border-color: var(--border) !important;
+}
+
+.wmde-markdown table th,
+.wmde-markdown table td {
+  border-color: var(--border) !important;
+}
+
+.wmde-markdown blockquote {
+  color: var(--foreground) !important;
+  border-left-color: var(--border) !important;
+}
+
+.wmde-markdown hr {
+  background-color: var(--border) !important;
+  border-color: var(--border) !important;
+}
+
+/* Dark mode */
+.dark .wmde-markdown {
+  color: var(--foreground) !important;
+}
+
+.dark .wmde-markdown h1,
+.dark .wmde-markdown h2,
+.dark .wmde-markdown h3,
+.dark .wmde-markdown h4,
+.dark .wmde-markdown h5,
+.dark .wmde-markdown h6 {
+  color: var(--foreground) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+.dark .wmde-markdown a {
+  color: var(--primary) !important;
+}
+
+.dark .wmde-markdown code {
+  background-color: var(--muted) !important;
+  color: var(--foreground) !important;
+}
+
+.dark .wmde-markdown pre {
+  background-color: var(--muted) !important;
+  border-color: var(--border);
+}
+
+.dark .wmde-markdown pre code {
+  color: var(--foreground) !important;
+}
+
+/* ダークモードのシンタックスハイライトカラー - GitHub Dark */
+.dark .wmde-markdown pre code .hljs-comment,
+.dark .wmde-markdown pre code .hljs-quote {
+  color: #8b949e;
+  font-style: italic;
+}
+
+.dark .wmde-markdown pre code .hljs-keyword,
+.dark .wmde-markdown pre code .hljs-selector-tag,
+.dark .wmde-markdown pre code .hljs-subst {
+  color: #ff7b72;
+}
+
+.dark .wmde-markdown pre code .hljs-number,
+.dark .wmde-markdown pre code .hljs-literal,
+.dark .wmde-markdown pre code .hljs-variable,
+.dark .wmde-markdown pre code .hljs-template-variable {
+  color: #79c0ff;
+}
+
+.dark .wmde-markdown pre code .hljs-string,
+.dark .wmde-markdown pre code .hljs-doctag {
+  color: #a5d6ff;
+}
+
+.dark .wmde-markdown pre code .hljs-title,
+.dark .wmde-markdown pre code .hljs-section,
+.dark .wmde-markdown pre code .hljs-selector-id {
+  color: #d2a8ff;
+  font-weight: 600;
+}
+
+.dark .wmde-markdown pre code .hljs-type,
+.dark .wmde-markdown pre code .hljs-class .hljs-title {
+  color: #79c0ff;
+  font-weight: 600;
+}
+
+.dark .wmde-markdown pre code .hljs-tag,
+.dark .wmde-markdown pre code .hljs-name,
+.dark .wmde-markdown pre code .hljs-attribute {
+  color: #7ee787;
+}
+
+.dark .wmde-markdown pre code .hljs-regexp,
+.dark .wmde-markdown pre code .hljs-link {
+  color: #a5d6ff;
+}
+
+.dark .wmde-markdown pre code .hljs-symbol,
+.dark .wmde-markdown pre code .hljs-bullet {
+  color: #ffa657;
+}
+
+.dark .wmde-markdown pre code .hljs-built_in,
+.dark .wmde-markdown pre code .hljs-builtin-name {
+  color: #79c0ff;
+}
+
+.dark .wmde-markdown pre code .hljs-meta {
+  color: #8b949e;
+}
+
+.dark .wmde-markdown pre code .hljs-deletion {
+  background-color: rgba(248, 81, 73, 0.15);
+  color: #ffa198;
+}
+
+.dark .wmde-markdown pre code .hljs-addition {
+  background-color: rgba(46, 160, 67, 0.15);
+  color: #7ee787;
+}
+
+.dark .wmde-markdown pre code .hljs-emphasis {
+  font-style: italic;
+}
+
+.dark .wmde-markdown pre code .hljs-strong {
+  font-weight: 700;
+}
+
+.dark .wmde-markdown table th,
+.dark .wmde-markdown table td {
+  border-color: var(--border) !important;
+}
+
+.dark .wmde-markdown blockquote {
+  color: var(--foreground) !important;
+  border-left-color: var(--border) !important;
+}
+
+.dark .wmde-markdown hr {
+  background-color: var(--border) !important;
+}
+
+/* Shimmer effect for skeleton loading */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    oklch(var(--muted) / 1) 0%,
+    oklch(var(--muted) / 0.6) 50%,
+    oklch(var(--muted) / 1) 100%
+  );
+  background-size: 1000px 100%;
+}
+
+/* Respect the user OS "reduce motion" preference.
+ * Wildcard reset is the widely-accepted pragma (MDN / a11y-project):
+ *   - 0.01ms (not 0ms) keeps animation/transition end-events firing so JS
+ *     listeners keyed on transitionend still work.
+ *   - Covers Tailwind animate- and transition- utilities and custom @keyframes.
+ * Opt back into motion per-element with motion-safe: Tailwind variant or an
+ * explicit media query override when motion conveys meaning. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
