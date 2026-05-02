@@ -6,6 +6,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
   images: {
     remotePatterns: [
