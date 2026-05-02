@@ -1,27 +1,20 @@
 // Seed env vars before any module that imports `@/lib/config/env`
-// (which validates `process.env` at import time and throws on missing keys).
-// NODE_ENV is set by vitest and has a schema default, so it's omitted here.
 process.env.DATABASE_URL ??= "postgresql://test:test@localhost:5432/test";
 process.env.NEXTAUTH_SECRET ??= "test-secret-at-least-32-characters-long!!";
 process.env.NEXTAUTH_URL ??= "http://localhost:3000";
+process.env.NEXT_PUBLIC_APP_URL ??= "http://localhost:3000";
 
 import { expect, afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
 import * as matchers from "@testing-library/jest-dom/matchers";
 
-// `server-only` throws at import time outside RSC; stub it so server modules
-// can be exercised under the jsdom test environment.
 vi.mock("server-only", () => ({}));
 
-// Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers);
-
-// Cleanup after each test
 afterEach(() => {
   cleanup();
 });
 
-// Mock Next.js router
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
@@ -31,18 +24,17 @@ vi.mock("next/navigation", () => ({
   }),
   usePathname: () => "/",
   useSearchParams: () => new URLSearchParams(),
+  redirect: vi.fn(),
+  notFound: vi.fn(),
 }));
 
-// `next/cache` helpers throw outside a request context
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
   revalidateTag: vi.fn(),
   unstable_cache: <T extends (...args: unknown[]) => unknown>(fn: T) => fn,
 }));
 
-// Mock Next.js image
-vi.mock("next/image", () => ({
-  default: ({ src, alt, ...props }: Record<string, unknown>) => {
-    return { type: "img", props: { src, alt, ...props } };
-  },
+vi.mock("next/headers", () => ({
+  headers: () => Promise.resolve(new Headers({ "x-request-id": "test-req-id" })),
+  cookies: () => Promise.resolve({ get: vi.fn(), set: vi.fn(), delete: vi.fn() }),
 }));
