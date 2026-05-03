@@ -85,6 +85,16 @@ export async function seedDev(prisma: PrismaClient) {
       tagNames: ["prisma", "typescript", "tips"],
     },
     {
+      slug: "alice-typescript-strict",
+      title: "TypeScript strict モードで安心して書くために",
+      content:
+        "# TypeScript strict モードで安心して書くために\n\n`strict: true` を有効にすると最初は型エラーに圧倒されますが、慣れてしまえば手放せません。\n\n## 最初に有効化したい設定\n\n- `noImplicitAny`\n- `strictNullChecks`\n- `noUncheckedIndexedAccess`\n\n型に守られると、リファクタリングが怖くなくなります。",
+      excerpt: "TypeScript の strict モードを使いこなすための設定と考え方を紹介します。",
+      authorId: alice.id,
+      categoryId: techCategory?.id ?? null,
+      tagNames: ["typescript", "tips"],
+    },
+    {
       slug: "bob-daily-routine",
       title: "在宅勤務を快適にする 1 日のルーチン",
       content:
@@ -103,6 +113,16 @@ export async function seedDev(prisma: PrismaClient) {
       authorId: bob.id,
       categoryId: null,
       tagNames: ["blog"],
+    },
+    {
+      slug: "bob-reading-habit",
+      title: "読書習慣を続けるためにやめた 3 つのこと",
+      content:
+        "# 読書習慣を続けるためにやめた 3 つのこと\n\n読書を継続できるようになったのは、何かを足したのではなく、いくつかをやめたからでした。\n\n## 1. 全部読み切ろうとするのをやめる\n## 2. 紙か電子かで悩むのをやめる\n## 3. 感想を SNS に書こうとするのをやめる\n\n読書は誰のためでもなく、自分のための時間です。",
+      excerpt: "読書を無理なく続けるために手放した習慣について書きました。",
+      authorId: bob.id,
+      categoryId: lifestyleCategory?.id ?? null,
+      tagNames: ["blog", "tips"],
     },
   ];
 
