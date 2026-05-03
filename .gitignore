@@ -44,6 +44,7 @@ prisma/*.db
 prisma/*.db-journal
 
 /docs/ai-dev-os
+/docs/test
 /public/uploads/
 
 # AI agents
