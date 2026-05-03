@@ -18,29 +18,32 @@ export default async function UserProfilePage({ params }: Props) {
   const { articles } = await getUserArticles(user.id, { status: "published" });
 
   return (
-    <div className="container max-w-4xl pb-8">
+    <div className="container max-w-4xl pb-8 space-y-6">
       <Card>
         <CardContent className="pt-6">
           <ProfileHeader user={user} isFollowing={isFollowingUser} />
-          <h2 className="text-xl font-semibold mb-4">記事</h2>
-          {articles.length === 0 ? (
-            <p className="text-muted-foreground">記事はまだありません</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {articles.map((article) => (
-                <ArticleCard
-                  key={article.id}
-                  article={{
-                    ...article,
-                    tags: article.tags || [],
-                    _count: article._count || { comments: 0, reactions: 0 }
-                  }}
-                />
-              ))}
-            </div>
-          )}
         </CardContent>
       </Card>
+
+      <section>
+        <h2 className="text-xl font-semibold mb-4">記事</h2>
+        {articles.length === 0 ? (
+          <p className="text-muted-foreground">記事はまだありません</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {articles.map((article) => (
+              <ArticleCard
+                key={article.id}
+                article={{
+                  ...article,
+                  tags: article.tags || [],
+                  _count: article._count || { comments: 0, reactions: 0 }
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
