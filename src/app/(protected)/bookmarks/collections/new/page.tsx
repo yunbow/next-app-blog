@@ -10,7 +10,7 @@ export default async function NewCollectionPage() {
   }
 
   return (
-    <div className="container max-w-2xl py-8">
+    <div className="container max-w-2xl pb-8">
       <BackLink href="/bookmarks" label="ブックマークに戻る" />
       <h1 className="text-2xl font-bold mb-6">新しいコレクション</h1>
       <CollectionForm mode="create" />

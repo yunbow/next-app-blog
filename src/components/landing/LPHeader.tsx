@@ -11,7 +11,7 @@ export function LPHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center space-x-2" aria-label={t("accessibility.homeLink")}>
           <span className="text-2xl font-bold">{t("common.appName")}</span>
         </Link>

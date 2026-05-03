@@ -51,7 +51,7 @@ export default async function CollectionDetailPage({ params }: Props) {
   const isOwner = collection.userId === session.user.id;
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="container max-w-6xl pb-8">
       <BackLink href="/bookmarks" label="ブックマークに戻る" />
       <div className="flex items-start justify-between mb-6">
         <div>

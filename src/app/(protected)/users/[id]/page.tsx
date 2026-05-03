@@ -18,7 +18,7 @@ export default async function UserProfilePage({ params }: Props) {
   const { articles } = await getUserArticles(user.id, { status: "published" });
 
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container max-w-4xl pb-8">
       <Card>
         <CardContent className="pt-6">
           <ProfileHeader user={user} isFollowing={isFollowingUser} />

@@ -10,7 +10,7 @@ export default async function NotificationsPage() {
   const notifications = await getNotifications(session.user.id);
 
   return (
-    <div className="container max-w-2xl py-8">
+    <div className="container max-w-2xl pb-8">
       <h1 className="text-2xl font-bold mb-6">通知</h1>
       <NotificationList notifications={notifications} />
     </div>

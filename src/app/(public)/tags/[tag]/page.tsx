@@ -1,5 +1,6 @@
 import { getArticlesByTag } from "@/features/search/services/search-service";
 import { ArticleList } from "@/features/article/components/ArticleList";
+import { BackLink } from "@/components/common/BackLink";
 
 type Props = {
   params: Promise<{ tag: string }>;
@@ -15,7 +16,8 @@ export default async function TagPage({ params, searchParams }: Props) {
   const result = await getArticlesByTag(tagName, currentPage);
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="container max-w-6xl pb-8">
+      <BackLink href="/search" label="検索に戻る" />
       <h1 className="text-2xl font-bold mb-6">タグ: {tagName}</h1>
       <ArticleList
         articles={result.articles}

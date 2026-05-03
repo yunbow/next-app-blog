@@ -8,10 +8,10 @@ export default function NotFound() {
         ページが見つかりません
       </p>
       <Link
-        href="/"
+        href="/search"
         className="mt-4 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
       >
-        ホームに戻る
+        検索に戻る
       </Link>
     </div>
   );

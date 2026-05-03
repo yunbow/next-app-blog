@@ -58,22 +58,44 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
 
 ## 4. データベース初期化
 
+### マイグレーション
+
 ```bash
 # マイグレーション適用 + Prisma Client 再生成
 npm run db:migrate:dev
-
-# 初期データ投入 (カテゴリ等)
-npm run db:seed
 ```
 
-スキーマは `prisma/schema.prisma`、シードは `prisma/seed.ts` を参照。
+スキーマは `prisma/schema.prisma` を参照。
 
-DB をリセットしたい場合:
+### シード投入
+
+シードは用途別に分かれている (`prisma/seeds/` 配下、ディスパッチャは `prisma/seed.ts`)。
+
+| コマンド               | 内容                                                                                       |
+| ---------------------- | ------------------------------------------------------------------------------------------ |
+| `npm run db:seed:dev`  | カテゴリ等のマスタ + **テストユーザー2名・記事4件・タグ・コメント・リアクション・相互フォロー** |
+| `npm run db:seed:prod` | カテゴリ等のマスタのみ (本番用)                                                              |
+| `npm run db:seed`      | `NODE_ENV` で自動判別 (`production` なら prod、それ以外は dev)                              |
+
+ローカルで起動直後にすぐ動作確認したい場合は `db:seed:dev` を使う。すべて upsert ベースで冪等なので何度実行しても安全。
+
+### 開発用ログイン情報 (`db:seed:dev` 投入後)
+
+| メールアドレス       | パスワード    | ユーザー名 |
+| -------------------- | ------------- | ---------- |
+| `alice@example.com`  | `password123` | alice      |
+| `bob@example.com`    | `password123` | bob        |
+
+各ユーザーは公開記事を 2 件ずつ持ち、相互フォロー / コメント / リアクションも投入済み。サインインフォームから上記のメールアドレスとパスワードでそのままログインできる。
+
+> `NODE_ENV=production` のときに `db:seed:dev` を実行すると、安全装置が働いてエラー終了する (事故防止のための明示的な仕様)。
+
+### DB リセット
 
 ```bash
 rm prisma/dev.db
 npm run db:migrate:dev
-npm run db:seed
+npm run db:seed:dev
 ```
 
 ## 5. 開発サーバー起動

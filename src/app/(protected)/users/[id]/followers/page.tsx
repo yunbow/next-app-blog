@@ -15,7 +15,7 @@ export default async function FollowersPage({ params }: Props) {
   const followers = await getFollowers(id);
 
   return (
-    <div className="container max-w-2xl py-8">
+    <div className="container max-w-2xl pb-8">
       <BackLink href={`/users/${id}`} label="プロフィールに戻る" />
       <h1 className="text-2xl font-bold mb-6">{user.name}のフォロワー</h1>
       <div className="space-y-3">

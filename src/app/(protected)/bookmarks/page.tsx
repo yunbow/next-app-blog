@@ -38,7 +38,7 @@ export default async function BookmarksPage() {
   ]);
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="container max-w-6xl pb-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">ブックマーク</h1>
         <Link href="/bookmarks/collections/new">

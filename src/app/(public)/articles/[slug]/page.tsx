@@ -70,8 +70,8 @@ export default async function ArticleDetailPage({ params }: Props) {
   const isAuthor = session?.user?.id === article.authorId;
 
   return (
-    <div className="container max-w-3xl py-8">
-      <BackLink href="/" label="ホームに戻る" />
+    <div className="container max-w-3xl pb-8">
+      <BackLink href="/search" label="検索に戻る" />
       <Card>
         <CardContent className="pt-6">
       {article.thumbnail && (

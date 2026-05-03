@@ -17,7 +17,7 @@ export default async function ProfileSettingsPage() {
   if (!user) redirect("/login");
 
   return (
-    <div className="container max-w-2xl py-8">
+    <div className="container max-w-2xl pb-8">
       <BackLink href="/settings" label="設定に戻る" />
       <Card>
         <CardHeader>

@@ -19,7 +19,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const result = await getArticlesByCategory(slug, currentPage);
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="container max-w-6xl pb-8">
       <h1 className="text-2xl font-bold mb-6">カテゴリ: {category.name}</h1>
       <ArticleList
         articles={result.articles}

@@ -8,7 +8,7 @@ export function LPFooter() {
 
   return (
     <footer className="border-t bg-muted/50" role="contentinfo">
-      <div className="container px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col items-center gap-4">
           <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground" aria-label={t("accessibility.footerNavigation")}>
             <Link href="/terms" className="hover:text-foreground transition-colors">

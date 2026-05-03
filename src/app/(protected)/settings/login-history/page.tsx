@@ -42,7 +42,7 @@ export default async function LoginHistoryPage() {
   });
 
   return (
-    <div className="container max-w-2xl py-6">
+    <div className="container max-w-2xl pb-6">
       <BackLink href="/settings" label="設定に戻る" />
       <h1 className="text-2xl font-bold mb-6">ログイン履歴</h1>
       <Card>

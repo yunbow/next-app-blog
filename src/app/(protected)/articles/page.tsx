@@ -23,7 +23,7 @@ export default async function ArticlesPage({ searchParams }: Props) {
   ]);
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="container max-w-6xl pb-8">
       <h1 className="text-2xl font-bold mb-6">最新の記事</h1>
       
       <ArticleFilters

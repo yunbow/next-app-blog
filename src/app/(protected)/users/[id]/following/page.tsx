@@ -15,7 +15,7 @@ export default async function FollowingPage({ params }: Props) {
   const following = await getFollowing(id);
 
   return (
-    <div className="container max-w-2xl py-8">
+    <div className="container max-w-2xl pb-8">
       <BackLink href={`/users/${id}`} label="プロフィールに戻る" />
       <h1 className="text-2xl font-bold mb-6">{user.name}がフォロー中</h1>
       <div className="space-y-3">

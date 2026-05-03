@@ -20,7 +20,9 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:status": "prisma migrate status",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "db:seed:dev": "tsx prisma/seed.ts dev",
+    "db:seed:prod": "tsx prisma/seed.ts prod"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

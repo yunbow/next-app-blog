@@ -25,7 +25,7 @@ export default async function SearchPage({ searchParams }: Props) {
   ]);
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="container max-w-6xl pb-8">
       <h1 className="text-2xl font-bold mb-6">検索</h1>
 
       <ArticleFilters categories={categories} basePath="/search" />

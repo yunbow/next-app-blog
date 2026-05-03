@@ -69,7 +69,7 @@ export default async function DashboardPage({ searchParams }: Props) {
   );
 
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container max-w-4xl pb-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">マイ記事</h1>
         <Link href="/articles/new">

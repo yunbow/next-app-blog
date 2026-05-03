@@ -68,7 +68,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <SkipLink />
         <div className="flex min-h-screen">
           <Sidebar />
-          <main id="main-content" className="flex-1 p-4 md:p-6 pb-20 md:pb-6">{children}</main>
+          <main id="main-content" className="flex-1 pt-4 px-4 md:px-6 pb-20 md:pb-6">{children}</main>
           <MobileNav />
         </div>
       </>
@@ -81,7 +81,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex flex-col min-h-screen">
         <SkipLink />
         <LPHeader />
-        <main id="main-content" className="flex-1">{children}</main>
+        <main id="main-content" className="flex-1 pt-4">{children}</main>
         <LPFooter />
       </div>
     );
@@ -93,7 +93,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <>
         <SkipLink />
         <Header />
-        <main id="main-content">{children}</main>
+        <main id="main-content" className="pt-4">{children}</main>
       </>
     );
   }

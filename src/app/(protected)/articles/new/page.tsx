@@ -9,7 +9,7 @@ export default async function NewArticlePage() {
   });
 
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container max-w-4xl pb-8">
       <BackLink href="/dashboard" label="マイ記事に戻る" />
       <Card>
         <CardHeader>

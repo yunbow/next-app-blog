@@ -9,7 +9,7 @@ export function SettingsContent() {
   const { t } = useTranslations();
 
   return (
-    <div className="container max-w-2xl py-6 space-y-6">
+    <div className="container max-w-2xl pb-6 space-y-6">
       <h1 className="text-2xl font-bold">{t("settings.title")}</h1>
 
       <div className="space-y-4">
