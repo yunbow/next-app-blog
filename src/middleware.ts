@@ -82,7 +82,7 @@ export default auth(async function middleware(request) {
     default-src 'self';
     script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: 'unsafe-inline';
     style-src 'self' 'unsafe-inline';
-    img-src 'self' blob: data: https:;
+    ${process.env.NODE_ENV === "development" ? "img-src 'self' blob: data: https: http://localhost:9000;" : "img-src 'self' blob: data: https:;"}
     font-src 'self';
     object-src 'none';
     base-uri 'self';

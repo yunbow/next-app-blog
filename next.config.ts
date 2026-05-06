@@ -18,6 +18,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "avatars.githubusercontent.com",
       },
+      // ローカル開発: MinIO
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "9000",
+      },
+      // 本番: Cloudflare R2 / カスタムドメイン (R2_PUBLIC_URL のホスト)
+      // 本番ホスト名を追加する場合はここに { protocol: "https", hostname: "..." } を追記
     ],
   },
   async headers() {

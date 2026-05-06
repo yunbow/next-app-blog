@@ -1,121 +1,149 @@
 # ローカル環境構築手順
 
-next-app-blog をローカルで開発するための手順をまとめる。
+next-app-blog をローカルで開発するための手順。
 
 ## 前提
 
-- Node.js **22.x** (Dockerfile の `NODE_VERSION=22-alpine` に揃える)
-- npm 10 以上 (Node.js 22 に同梱)
-- Git
-- (任意) macOS / Linux / WSL のいずれか。Windows ネイティブでも動作するが、本リポジトリの開発は bash 系シェルを前提としている
+| ツール | バージョン | 備考 |
+| --- | --- | --- |
+| Node.js | 22.x | Dockerfile の `NODE_VERSION=22-alpine` に揃える |
+| npm | 10 以上 | Node.js 22 に同梱 |
+| Docker Desktop | 最新 | PostgreSQL / MinIO の起動に必要 |
 
-## 1. リポジトリの取得
+---
+
+## セットアップ手順
+
+### 1. リポジトリの取得
 
 ```bash
 git clone <repo-url> next-app-blog
 cd next-app-blog
-git submodule update --init --recursive   # docs/ai-dev-os の取得
 ```
 
-## 2. 依存関係のインストール
+### 2. 依存関係のインストール
 
 ```bash
-npm ci    # 既存の package-lock.json を厳密に再現する
+npm ci
 ```
 
 `postinstall` に `prisma generate` が紐付いているため、Prisma クライアントは自動生成される。
 
-## 3. 環境変数の設定
-
-ルートに `.env` を作成する。テンプレートとして `.env.example` をコピーすると早い。
+### 3. 環境変数の設定
 
 ```bash
 cp .env.example .env
 ```
 
-最低限、以下 3 つを埋めれば dev サーバーは起動する。
+`.env` を開いて以下の必須項目を確認・設定する。
 
-| Key               | 値の例                                          | 備考                                                                 |
-| ----------------- | ----------------------------------------------- | -------------------------------------------------------------------- |
-| `DATABASE_URL`    | `file:./prisma/dev.db`                          | Prisma datasource は SQLite。任意のローカルパスでよい                |
-| `NEXTAUTH_SECRET` | 32 文字以上のランダム文字列                     | **32 文字未満で起動失敗する**。`openssl rand -base64 48` 等で生成    |
-| `NEXTAUTH_URL`    | `http://localhost:3000`                         | URL 形式必須                                                         |
+**必須項目**
 
-任意項目（`src/lib/config/env.ts` のスキーマで検証される）:
-
-- **OAuth**: `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` の **両方** をセット (片方だけはエラー)。GitHub も同様
-- **SMTP**: `SMTP_HOST` / `SMTP_USER` / `SMTP_PASSWORD` の **3 つすべて** をセット (一部だけはエラー)
-- `CRON_SECRET`: 32 文字以上
-- `NEXT_PUBLIC_APP_URL`: クライアントから参照する公開 URL
-
-`NEXTAUTH_SECRET` 生成例:
+| Key | 値の例 | 備考 |
+| --- | --- | --- |
+| `DATABASE_URL` | `postgresql://app:app@localhost:54321/app?schema=public` | docker compose で起動する PostgreSQL |
+| `NEXTAUTH_SECRET` | 32 文字以上のランダム文字列 | **32 文字未満で起動失敗**。下記コマンドで生成 |
+| `NEXTAUTH_URL` | `http://localhost:3111` | URL 形式必須 |
 
 ```bash
+# NEXTAUTH_SECRET 生成
 openssl rand -base64 48
-# または
-node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
 ```
 
-## 4. データベース初期化
+**任意項目** (片方だけ設定するとエラーになる組み合わせに注意)
 
-### マイグレーション
+| 機能 | Key |
+| --- | --- |
+| Google OAuth | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — **両方セット or 両方空** |
+| GitHub OAuth | `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` — **両方セット or 両方空** |
+| SMTP メール | `SMTP_HOST` / `SMTP_USER` / `SMTP_PASSWORD` — **3 つすべてセット or すべて空** |
+| Cron 認証 | `CRON_SECRET` (32 文字以上、本番では必須) |
+| 公開 URL | `NEXT_PUBLIC_APP_URL` (OG 画像・sitemap に使用) |
+
+**画像ストレージ (R2 / MinIO)**
+
+4 つすべてセットすると R2/MinIO へのアップロードが有効になる。未設定の場合は `public/uploads/` へのローカル保存にフォールバックする。
+
+| Key | ローカル (MinIO) | 本番 (Cloudflare R2) |
+| --- | --- | --- |
+| `R2_ACCESS_KEY_ID` | `minioadmin` | R2 API トークンの Access Key ID |
+| `R2_SECRET_ACCESS_KEY` | `minioadmin` | R2 API トークンの Secret Access Key |
+| `R2_BUCKET_NAME` | `blog` | バケット名 |
+| `R2_ENDPOINT` | `http://localhost:9000` | `https://<accountid>.r2.cloudflarestorage.com` |
+| `R2_PUBLIC_URL` | `http://localhost:9000/blog` | `https://<カスタムドメイン or r2.dev URL>` |
+
+`.env.example` にローカル用のデフォルト値が入っているので、`cp .env.example .env` 後そのまま使える。
+
+### 4. Docker サービスの起動
 
 ```bash
-# マイグレーション適用 + Prisma Client 再生成
-npm run db:migrate:dev
+docker compose up -d
 ```
 
-スキーマは `prisma/schema.prisma` を参照。
+起動するサービス:
 
-### シード投入
+| サービス | ポート | 用途 |
+| --- | --- | --- |
+| PostgreSQL | `54321` | アプリの DB |
+| MinIO (S3 API) | `9000` | 画像ストレージ |
+| MinIO (コンソール) | `9001` | 管理 UI (`http://localhost:9001`) |
 
-シードは用途別に分かれている (`prisma/seeds/` 配下、ディスパッチャは `prisma/seed.ts`)。
-
-| コマンド               | 内容                                                                                       |
-| ---------------------- | ------------------------------------------------------------------------------------------ |
-| `npm run db:seed:dev`  | カテゴリ等のマスタ + **テストユーザー2名・記事4件・タグ・コメント・リアクション・相互フォロー** |
-| `npm run db:seed:prod` | カテゴリ等のマスタのみ (本番用)                                                              |
-| `npm run db:seed`      | `NODE_ENV` で自動判別 (`production` なら prod、それ以外は dev)                              |
-
-ローカルで起動直後にすぐ動作確認したい場合は `db:seed:dev` を使う。すべて upsert ベースで冪等なので何度実行しても安全。
-
-### 開発用ログイン情報 (`db:seed:dev` 投入後)
-
-| メールアドレス       | パスワード    | ユーザー名 |
-| -------------------- | ------------- | ---------- |
-| `alice@example.com`  | `password123` | alice      |
-| `bob@example.com`    | `password123` | bob        |
-
-各ユーザーは公開記事を 2 件ずつ持ち、相互フォロー / コメント / リアクションも投入済み。サインインフォームから上記のメールアドレスとパスワードでそのままログインできる。
-
-> `NODE_ENV=production` のときに `db:seed:dev` を実行すると、安全装置が働いてエラー終了する (事故防止のための明示的な仕様)。
-
-### DB リセット
+起動確認:
 
 ```bash
-rm prisma/dev.db
+docker compose ps
+```
+
+`STATUS` 列が `Up (healthy)` になっていれば OK。`(starting)` の間は接続失敗するので数秒待つ。
+
+MinIO の初回バケット作成は `minio-init` コンテナが自動で行う。
+
+### 5. データベース初期化
+
+```bash
+# マイグレーション適用
 npm run db:migrate:dev
+
+# 開発用テストデータ投入 (任意)
 npm run db:seed:dev
 ```
 
-## 5. 開発サーバー起動
+シードコマンドの違い:
+
+| コマンド | 内容 |
+| --- | --- |
+| `npm run db:seed:dev` | マスタ + テストユーザー 2 名・記事 4 件・タグ・コメント・リアクション |
+| `npm run db:seed:prod` | マスタのみ (本番用) |
+
+シードはすべて upsert ベースで冪等なので、何度実行しても安全。
+
+**開発用ログイン情報** (`db:seed:dev` 投入後)
+
+| メールアドレス | パスワード |
+| --- | --- |
+| `alice@example.com` | `password123` |
+| `bob@example.com` | `password123` |
+
+### 6. 開発サーバーの起動
 
 ```bash
-npm run dev
+npm run dev -- -p 3111
 ```
 
-`http://localhost:3000` で起動する。
+`http://localhost:3111` で起動する。
 
-> 既存セッション Cookie を持ったまま `NEXTAUTH_SECRET` を変えると `JWTSessionError: no matching decryption secret` が出る。DevTools → Application → Cookies で `authjs.session-token` を削除するか、シークレットウィンドウで開く。
+> 既存セッション Cookie を持ったまま `NEXTAUTH_SECRET` を変えると `JWTSessionError` が出る。DevTools → Application → Cookies で `authjs.session-token` を削除するか、シークレットウィンドウで開く。
 
-## 6. テスト実行
+---
+
+## テスト実行
 
 ### ユニット / 結合テスト (Vitest)
 
 ```bash
-npm test               # 1 回実行
-npm run test:watch     # ウォッチモード
-npm run test:coverage  # カバレッジ計測
+npm test                # 1 回実行
+npm run test:watch      # ウォッチモード
+npm run test:coverage   # カバレッジ計測
 ```
 
 ### E2E テスト (Playwright)
@@ -126,154 +154,55 @@ npm run test:coverage  # カバレッジ計測
 npx playwright install --with-deps
 ```
 
-実行:
-
 ```bash
 npm run test:e2e          # ヘッドレス
 npm run test:e2e:ui       # UI モード
 npm run test:e2e:debug    # デバッグモード
 ```
 
-`playwright.config.ts` の `webServer` が `npm run dev` を起動するため、別途 dev サーバーを立ち上げる必要はない。
+`playwright.config.ts` の `webServer` が `npm run dev` を自動起動するため、別途 dev サーバーを立ち上げる必要はない。
 
-## 7. Lint / 型チェック
+---
+
+## Lint / 型チェック
 
 ```bash
 npm run lint
 npx tsc --noEmit
 ```
 
-## トラブルシューティング
-
-| 症状                                                                                       | 対処                                                                                                              |
-| ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `Invalid environment variables: NEXTAUTH_SECRET must be at least 32 chars`                 | `.env` の `NEXTAUTH_SECRET` を 32 文字以上にする                                                                  |
-| `Google OAuth keys must be all-set or all-unset`                                           | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` の両方を設定するか、両方を空にする (GitHub / SMTP も同型のエラーあり) |
-| `JWTSessionError: no matching decryption secret`                                           | ブラウザの `authjs.session-token` Cookie を削除                                                                   |
-| `git submodule add ... already exists in the index` (`npx ai-dev-os init` 実行時)         | サブモジュールは初回 init で追加済み。再実行は不要 (commit するだけで OK)                                          |
-| `The "middleware" file convention is deprecated`                                            | Next.js 16 の警告。動作には影響なし。`middleware.ts` → `proxy.ts` への移行は別タスク                              |
-
 ---
 
-## PostgreSQL 構築・運用手順
-
-このプロジェクトは独立した PostgreSQL コンテナを `docker-compose.yml` で持つ設計です。本プロジェクトの DB は **ホスト側ポート `54321`** で公開されます (他の `next-app-*` プロジェクトとは衝突しないよう個別に割り当て済み)。
-
-### 前提
-
-- **Docker Desktop** が起動していること (`docker version` が通る)
-- `.env` に `DATABASE_URL` が入っていること
-- `npm install` 完了
-
-### 1. PostgreSQL コンテナを起動
-
-プロジェクトのルートで:
-
-```powershell
-docker compose up -d
-```
-
-- `-d` でバックグラウンド起動
-- 初回はイメージ pull で 1〜2 分かかる
-- 2 回目以降は数秒で立ち上がる
-
-起動確認:
-
-```powershell
-docker compose ps
-```
-
-`STATUS` 列が `Up (healthy)` になっていれば OK (compose の healthcheck で `pg_isready` を見ている)。`(starting)` の間は接続失敗するので、healthy になるまで数秒待つ。
-
-### 2. マイグレーション適用
-
-スキーマを DB に反映 (初回 = テーブル作成、2 回目以降 = 差分適用):
-
-```powershell
-npm run db:migrate:dev
-```
-
-新しい migration を生成したいときは `--name` を渡す:
-
-```powershell
-npm run db:migrate:dev -- --name <name>
-```
-
-CI / 本番系では対話処理を伴わない deploy 系を使う:
-
-```powershell
-npm run db:migrate:deploy
-```
-
-### 3. SEED 投入 (任意)
-
-開発用テストデータを投入:
-
-```powershell
-npm run db:seed:dev
-```
-
-冪等なので何度実行しても重複しません。
-
-### 4. アプリ起動
-
-```powershell
-npm run dev
-```
-
-`http://localhost:3000` にアクセスして動作確認。
-
-### 5. データ確認・操作
-
-GUI で中身を見たい場合:
-
-```powershell
-npm run prisma:studio
-```
-
-`http://localhost:5555` で Prisma Studio が開きます。
-
-CLI で直接 psql に入りたい場合:
-
-```powershell
-docker compose exec db psql -U app -d app
-```
-
-### ライフサイクル運用
+## Docker ライフサイクル
 
 | 操作 | コマンド | 備考 |
 | --- | --- | --- |
-| 停止 (データ保持) | `docker compose stop` | 次回 `start` で即復帰 |
+| 停止 (データ保持) | `docker compose stop` | `start` で即復帰 |
 | 再開 | `docker compose start` | |
 | 完全停止＋コンテナ削除 | `docker compose down` | ボリュームは残る |
-| **DB を完全リセット** | `docker compose down -v` | ⚠ 全データ消失 |
-| ログ追跡 | `docker compose logs -f db` | エラー調査時 |
+| **DB / MinIO を完全リセット** | `docker compose down -v` | ⚠ 全データ消失 |
+| ログ追跡 | `docker compose logs -f` | `-f db` / `-f minio` で絞り込み可 |
 
-ハマったときの定番リセット手順:
+DB をリセットしたい場合:
 
-```powershell
+```bash
 docker compose down -v
 docker compose up -d
 npm run db:migrate:dev
 npm run db:seed:dev
 ```
 
-### 複数プロジェクトを同時に起動する場合
+複数の `next-app-*` プロジェクトは `name:` フィールドとホスト側ポートが個別割当になっているため、同時起動できる。
 
-`docker-compose.yml` の `name:` フィールドが各プロジェクトで異なるため、コンテナは独立して並走できます。ホスト側ポートも 54321〜54342 で固有割当なので衝突しません。
+---
 
-すべて起動するとメモリ消費が積み上がるので、使わないものは `docker compose stop` しておくのが無難です。
+## トラブルシューティング
 
-全プロジェクトの DB を一覧:
-
-```powershell
-docker ps --filter "name=next-app-" --format "table {{.Names}}\t{{.Ports}}\t{{.Status}}"
-```
-
-### トラブルシューティング
-
-| 症状 | 原因 | 対処 |
-| --- | --- | --- |
-| `port is already allocated` | 該当ポートが他のサービスで使用中 | `docker compose down`、または `netstat -ano \| Select-String "54321"` で犯人を特定 |
-| `P1001: Can't reach database server` | コンテナがまだ healthy でない、もしくは `.env` の `DATABASE_URL` のポートと `docker-compose.yml` の publish ポートが不一致 | healthcheck 完了を待つ / `.env` を確認 |
-| マイグレーションが破綻 | dev 環境で発生する典型 | `docker compose down -v` で DB をリセットしてから `npm run db:migrate:dev` |
+| 症状 | 対処 |
+| --- | --- |
+| `Invalid environment variables: NEXTAUTH_SECRET must be at least 32 chars` | `.env` の `NEXTAUTH_SECRET` を 32 文字以上にする |
+| `Google OAuth keys must be all-set or all-unset` | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` の両方を設定するか両方を空にする (GitHub / SMTP も同様) |
+| `JWTSessionError: no matching decryption secret` | ブラウザの `authjs.session-token` Cookie を削除 |
+| `P1001: Can't reach database server` | `docker compose ps` で healthy を確認 / `.env` の `DATABASE_URL` ポートが `54321` か確認 |
+| `port is already allocated` | `docker compose down` 後に再起動、または `lsof -ti :54321 \| xargs kill -9` |
+| `Unable to acquire lock at .next/dev/lock` | 既存の `next dev` プロセスを終了: `pkill -f "next dev"` |

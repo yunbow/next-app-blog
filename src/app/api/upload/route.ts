@@ -5,6 +5,7 @@ import path from "path";
 import crypto from "crypto";
 import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 import { logger } from "@/lib/logger";
+import { R2_ENABLED, uploadBlogImage } from "@/lib/storage/r2";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -42,16 +43,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "JPG, PNG, GIF, WebPのみアップロード可能です" }, { status: 400 });
     }
 
-    const ext = file.name.split(".").pop();
-    const filename = `${crypto.randomBytes(16).toString("hex")}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-    await mkdir(uploadDir, { recursive: true });
-
+    const ext = file.name.split(".").pop() ?? "jpg";
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(uploadDir, filename), buffer);
 
-    const response = NextResponse.json({ url: `/uploads/${filename}` });
+    let url: string;
+
+    if (R2_ENABLED) {
+      url = await uploadBlogImage({
+        userId: session.user.id,
+        buffer,
+        mimeType: file.type,
+        ext,
+      });
+    } else {
+      const filename = `${crypto.randomBytes(16).toString("hex")}.${ext}`;
+      const uploadDir = path.join(process.cwd(), "public", "uploads");
+      await mkdir(uploadDir, { recursive: true });
+      await writeFile(path.join(uploadDir, filename), buffer);
+      url = `/uploads/${filename}`;
+    }
+
+    const response = NextResponse.json({ url });
     response.headers.set("X-RateLimit-Limit", "20");
     response.headers.set("X-RateLimit-Remaining", rateLimitResult.remaining.toString());
     response.headers.set("X-RateLimit-Reset", rateLimitResult.resetAt.toString());
