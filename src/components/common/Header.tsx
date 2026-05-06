@@ -5,8 +5,10 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
+import { BrandLogo } from "@/components/common/BrandLogo";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useTranslations } from "@/lib/i18n";
 
 function SearchForm() {
   const router = useRouter();
@@ -49,13 +51,16 @@ function SearchForm() {
 
 export function Header() {
   const { data: session } = useSession();
+  const { t } = useTranslations();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center gap-4 pl-[20px]">
-        <Link href="/" className="flex items-center space-x-2">
-          <span className="text-xl font-bold">Blog</span>
-        </Link>
+        <BrandLogo
+          label={t("accessibility.homeLink")}
+          iconClassName="size-8"
+          textClassName="text-xl"
+        />
 
         <Suspense fallback={
           <form className="flex-1 max-w-md">

@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 export const size = { width: 32, height: 32 };
-export const contentType = "image/svg+xml";
+export const contentType = "image/png";
 
 export default function Icon() {
   return new ImageResponse(
@@ -15,6 +15,7 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          position: "relative",
           color: "white",
           fontSize: 20,
           fontWeight: 700,
@@ -23,6 +24,28 @@ export default function Icon() {
         }}
       >
         B
+        <div
+          style={{
+            position: "absolute",
+            top: 11,
+            left: 13,
+            width: 8,
+            height: 2,
+            borderRadius: 999,
+            background: "#2488ff",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 16,
+            left: 13,
+            width: 7,
+            height: 2,
+            borderRadius: 999,
+            background: "#ffffff",
+          }}
+        />
       </div>
     ),
     { ...size },

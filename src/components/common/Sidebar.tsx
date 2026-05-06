@@ -17,6 +17,7 @@ import {
 import { useState, useSyncExternalStore } from "react";
 import { useNotificationStream } from "@/features/notification/hooks/useNotificationStream";
 import { getImageUrl } from "@/lib/utils/image-url";
+import { BrandLogo } from "@/components/common/BrandLogo";
 import {
   SearchIcon,
   BellIcon,
@@ -94,11 +95,13 @@ export function Sidebar() {
     >
       {/* ロゴ + 開閉ボタン */}
       <div className="flex items-center justify-between p-4 border-b">
-        {!isCollapsed && (
-          <Link href="/" className="text-xl font-bold" aria-label={t("accessibility.homeLink")}>
-            Blog
-          </Link>
-        )}
+        <BrandLogo
+          label={t("accessibility.homeLink")}
+          showText={!isCollapsed}
+          iconClassName="size-8"
+          textClassName="text-xl"
+          className={cn(isCollapsed && "mx-auto")}
+        />
         <Button
           variant="ghost"
           size="icon"

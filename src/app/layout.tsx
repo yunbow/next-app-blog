@@ -48,7 +48,13 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: process.env.VERCEL_ENV === "production"
       ? { index: true, follow: true }
       : { index: false, follow: false },
-    icons: { icon: "/icon", apple: "/apple-icon" },
+    icons: {
+      icon: [
+        { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+        { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      ],
+      apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+    },
   };
 }
 

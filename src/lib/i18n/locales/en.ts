@@ -127,24 +127,69 @@ export const en: Translations = {
   // Landing Page
   landing: {
     hero: {
+      kicker: "Write in Markdown, reach readers, grow your ideas",
       title: "Share Your Knowledge",
-      subtitle: "Write articles in Markdown and share with the world. Monetize your content on our blogging platform.",
+      subtitle: "A blogging platform for writing, publishing, search, comments, reactions, bookmarks, and the workflows around every article.",
       cta: "Get started for free",
+      secondaryCta: "Login",
+      statArticles: "Markdown",
+      statArticlesLabel: "Focused writing",
+      statModes: "Public / Draft",
+      statModesLabel: "Publishing control",
+      statSignals: "Comments + Reactions",
+      statSignalsLabel: "Reader signals",
     },
     features: {
       title: "What you can do with Blog",
+      subtitle: "From private learning notes to published articles, Blog keeps the operational pieces close to the writing.",
       markdown: {
         title: "Write in Markdown",
-        description: "Create articles with simple and powerful Markdown syntax",
+        description: "Draft rich articles with preview support and image uploads.",
       },
       share: {
         title: "Easy Sharing",
-        description: "Publish articles and connect with readers",
+        description: "Published articles are discoverable through search, categories, and tags.",
       },
       monetize: {
         title: "Monetization",
-        description: "Turn your knowledge into revenue with paid articles",
+        description: "Manage content with paid articles and future revenue paths in mind.",
       },
+      audience: {
+        title: "Reader Feedback",
+        description: "Track comments, reactions, and notifications around each article.",
+      },
+      organize: {
+        title: "Save and Organize",
+        description: "Use bookmarks and collections to keep useful articles close.",
+      },
+      notify: {
+        title: "Stay Current",
+        description: "Follow activity, comments, and updates through notifications.",
+      },
+    },
+    workflow: {
+      kicker: "Article workflow",
+      title: "A Clear Path From Draft to Published",
+      subtitle: "Writing, distribution, and feedback stay connected so each article can keep improving.",
+      draft: {
+        label: "01",
+        title: "Draft the article",
+        description: "Shape Markdown, images, categories, and tags in one editing flow.",
+      },
+      publish: {
+        label: "02",
+        title: "Publish and share",
+        description: "Turn the draft into a searchable article readers can open and share.",
+      },
+      learn: {
+        label: "03",
+        title: "Learn from response",
+        description: "Use comments, reactions, and bookmarks as signals for what to improve.",
+      },
+    },
+    cta: {
+      title: "Publish Your First Article",
+      description: "Turn what you learned, built, or tested into a page others can read.",
     },
   },
 

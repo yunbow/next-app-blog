@@ -106,12 +106,21 @@ export type Translations = {
   };
   landing: {
     hero: {
+      kicker: string;
       title: string;
       subtitle: string;
       cta: string;
+      secondaryCta: string;
+      statArticles: string;
+      statArticlesLabel: string;
+      statModes: string;
+      statModesLabel: string;
+      statSignals: string;
+      statSignalsLabel: string;
     };
     features: {
       title: string;
+      subtitle: string;
       markdown: {
         title: string;
         description: string;
@@ -124,6 +133,42 @@ export type Translations = {
         title: string;
         description: string;
       };
+      audience: {
+        title: string;
+        description: string;
+      };
+      organize: {
+        title: string;
+        description: string;
+      };
+      notify: {
+        title: string;
+        description: string;
+      };
+    };
+    workflow: {
+      kicker: string;
+      title: string;
+      subtitle: string;
+      draft: {
+        label: string;
+        title: string;
+        description: string;
+      };
+      publish: {
+        label: string;
+        title: string;
+        description: string;
+      };
+      learn: {
+        label: string;
+        title: string;
+        description: string;
+      };
+    };
+    cta: {
+      title: string;
+      description: string;
     };
   };
   cookieConsent: {
@@ -296,24 +341,69 @@ export const ja: Translations = {
   // Landing Page
   landing: {
     hero: {
+      kicker: "Markdownで書き、読者に届け、反応を育てる",
       title: "あなたの知識を共有しよう",
-      subtitle: "Markdownで記事を書いて、世界中の人と共有。収益化も可能なブログプラットフォーム。",
+      subtitle: "記事の執筆、公開、検索、コメント、リアクション、ブックマークまでをひとつにまとめたブログプラットフォーム。",
       cta: "無料で始める",
+      secondaryCta: "ログイン",
+      statArticles: "Markdown",
+      statArticlesLabel: "快適な執筆",
+      statModes: "Public / Draft",
+      statModesLabel: "公開管理",
+      statSignals: "Comments + Reactions",
+      statSignalsLabel: "読者の反応",
     },
     features: {
       title: "Blogでできること",
+      subtitle: "個人の学習メモから公開記事まで、書いたあとに必要になる運用もまとめて扱えます。",
       markdown: {
         title: "Markdownで執筆",
-        description: "シンプルで強力なMarkdown記法で記事を作成",
+        description: "プレビューを見ながら、画像付きの記事を素早く整えられます。",
       },
       share: {
         title: "簡単に共有",
-        description: "記事を公開して、読者とつながる",
+        description: "公開記事は検索、カテゴリ、タグから見つけやすくなります。",
       },
       monetize: {
         title: "収益化",
-        description: "有料記事で知識を収益に変える",
+        description: "有料記事を見据えたコンテンツ管理にも対応できます。",
       },
+      audience: {
+        title: "読者との接点",
+        description: "コメント、リアクション、通知で記事への反応を追えます。",
+      },
+      organize: {
+        title: "保存と整理",
+        description: "ブックマークとコレクションで読み返したい記事を管理できます。",
+      },
+      notify: {
+        title: "運用を見逃さない",
+        description: "フォローやコメントなどの更新を通知で確認できます。",
+      },
+    },
+    workflow: {
+      kicker: "記事公開の流れ",
+      title: "公開までの流れをシンプルに",
+      subtitle: "書く前後の作業を分断せず、記事を継続的に改善しやすい形に整えています。",
+      draft: {
+        label: "01",
+        title: "下書きを作る",
+        description: "Markdown、画像、カテゴリ、タグをまとめて編集します。",
+      },
+      publish: {
+        label: "02",
+        title: "公開して届ける",
+        description: "検索や共有から読者に届く公開記事として配信します。",
+      },
+      learn: {
+        label: "03",
+        title: "反応を見て育てる",
+        description: "コメント、リアクション、ブックマークを手がかりに改善します。",
+      },
+    },
+    cta: {
+      title: "最初の記事を公開しよう",
+      description: "学んだこと、試したこと、誰かに残したい知識をすぐに記事にできます。",
     },
   },
 
