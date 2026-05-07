@@ -74,6 +74,21 @@ openssl rand -base64 48
 
 `.env.example` にローカル用のデフォルト値が入っているので、`cp .env.example .env` 後そのまま使える。
 
+**Stripe サブスクリプション**
+
+ローカル開発では `stripe-mock` を使うため、実際の Stripe アカウントは不要。
+
+| Key | ローカル (stripe-mock) | 本番 (Stripe) |
+| --- | --- | --- |
+| `STRIPE_SECRET_KEY` | 任意の文字列 (例: `sk_test_mock`) | Stripe ダッシュボードのシークレットキー |
+| `STRIPE_WEBHOOK_SECRET` | 不要 (空) | `stripe listen` または ダッシュボードで取得 |
+| `STRIPE_BASIC_PRICE_ID` | 任意の文字列 (例: `price_basic`) | Stripe で作成した Price の ID |
+| `STRIPE_PREMIUM_PRICE_ID` | 任意の文字列 (例: `price_premium`) | Stripe で作成した Price の ID |
+| `STRIPE_API_URL` | `localhost` | **未設定** (本番は公式 API に接続) |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | 任意の文字列 | Stripe ダッシュボードの公開キー |
+
+`STRIPE_API_URL=localhost` をセットすると `stripe-mock`（port 12111）に向く。本番では必ずこの変数を **空または未設定** にする。
+
 ### 4. Docker サービスの起動
 
 ```bash
@@ -87,6 +102,8 @@ docker compose up -d
 | PostgreSQL | `54321` | アプリの DB |
 | MinIO (S3 API) | `9000` | 画像ストレージ |
 | MinIO (コンソール) | `9001` | 管理 UI (`http://localhost:9001`) |
+| stripe-mock (HTTP) | `12111` | Stripe API モック (`STRIPE_API_URL=localhost` で接続) |
+| stripe-mock (HTTPS) | `12112` | Stripe API モック (TLS) |
 
 起動確認:
 
@@ -206,3 +223,6 @@ npm run db:seed:dev
 | `P1001: Can't reach database server` | `docker compose ps` で healthy を確認 / `.env` の `DATABASE_URL` ポートが `54321` か確認 |
 | `port is already allocated` | `docker compose down` 後に再起動、または `lsof -ti :54321 \| xargs kill -9` |
 | `Unable to acquire lock at .next/dev/lock` | 既存の `next dev` プロセスを終了: `pkill -f "next dev"` |
+| Stripe Checkout が開かない / `STRIPE_SECRET_KEY is not set` | `.env` に `STRIPE_SECRET_KEY` を設定する (ローカルは任意の文字列で可) |
+| stripe-mock に繋がらない | `docker compose ps` で stripe-mock が `Up` か確認 / `STRIPE_API_URL=localhost` が `.env` にあるか確認 |
+| Webhook 署名エラー (`No signatures found matching`) | `stripe listen --forward-to localhost:3111/api/stripe/webhook` で取得した `whsec_...` を `STRIPE_WEBHOOK_SECRET` に設定 |

@@ -37,6 +37,13 @@ services:
       timeout: 3s
       retries: 10
 
+  stripe-mock:
+    image: stripe/stripe-mock:latest
+    restart: unless-stopped
+    ports:
+      - "12111:12111"  # HTTP (STRIPE_API_URL に指定)
+      - "12112:12112"  # HTTPS
+
   minio-init:
     image: minio/mc:latest
     depends_on:
