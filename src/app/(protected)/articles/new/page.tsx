@@ -1,12 +1,19 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { ArticleForm } from "@/features/article/components/ArticleForm";
 import { BackLink } from "@/components/common/BackLink";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
+import { getUserPlan } from "@/lib/stripe/plan-gate";
 
 export default async function NewArticlePage() {
-  const categories = await prisma.category.findMany({
-    orderBy: { name: "asc" },
-  });
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+
+  const [categories, { isPremium, isBasicOrAbove }] = await Promise.all([
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    getUserPlan(session.user.id),
+  ]);
 
   return (
     <div className="container max-w-4xl pb-8">
@@ -16,7 +23,12 @@ export default async function NewArticlePage() {
           <CardTitle className="text-2xl">新規記事作成</CardTitle>
         </CardHeader>
         <CardContent>
-          <ArticleForm mode="create" categories={categories} />
+          <ArticleForm
+            mode="create"
+            categories={categories}
+            isPremium={isPremium}
+            isBasicOrAbove={isBasicOrAbove}
+          />
         </CardContent>
       </Card>
     </div>

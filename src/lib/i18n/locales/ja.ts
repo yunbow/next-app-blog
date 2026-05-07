@@ -205,6 +205,23 @@ export type Translations = {
     loginHistoryDescription: string;
     changePassword: string;
     changePasswordDescription: string;
+    subscription: string;
+    subscriptionDescription: string;
+    billing: string;
+    currentPlan: string;
+    planFree: string;
+    planBasic: string;
+    planPremium: string;
+    planBasicDescription: string;
+    planPremiumDescription: string;
+    switchPlan: string;
+    cancelSubscription: string;
+    cancelConfirm: string;
+    currentPlanBadge: string;
+    renewsOn: string;
+    cancelsOn: string;
+    switchSuccess: string;
+    checkoutRedirecting: string;
   };
   about: {
     title: string;
@@ -446,6 +463,23 @@ export const ja: Translations = {
     loginHistoryDescription: "最近のログイン履歴を確認",
     changePassword: "パスワード変更",
     changePasswordDescription: "パスワードを変更",
+    subscription: "サブスクリプション",
+    subscriptionDescription: "現在のプランと請求情報",
+    billing: "プラン・お支払い",
+    currentPlan: "現在のプラン",
+    planFree: "フリー",
+    planBasic: "Basic",
+    planPremium: "Premium",
+    planBasicDescription: "基本機能をすべて利用できるスタンダードプラン",
+    planPremiumDescription: "すべての機能を制限なく利用できるプレミアムプラン",
+    switchPlan: "このプランに切り替え",
+    cancelSubscription: "解約する",
+    cancelConfirm: "サブスクリプションを解約しますか？現在の期間終了後に解約されます。",
+    currentPlanBadge: "現在のプラン",
+    renewsOn: "次回更新日: {date}",
+    cancelsOn: "解約予定日: {date}",
+    switchSuccess: "プランを切り替えました",
+    checkoutRedirecting: "決済ページへ移動中...",
   },
 
   // About Page

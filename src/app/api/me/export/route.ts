@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getUserPlan } from "@/lib/stripe/plan-gate";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,6 +42,14 @@ export async function GET() {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
   const userId = session.user.id;
+
+  const { isPremium } = await getUserPlan(userId);
+  if (!isPremium) {
+    return Response.json(
+      { error: "データエクスポートはPremiumプランの機能です。" },
+      { status: 403 },
+    );
+  }
 
   const [user, articles, comments, bookmarks, bookmarkCollections, reactions] =
     await Promise.all([

@@ -1,18 +1,46 @@
 "use client";
 
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Globe, User, History, KeyRound } from "lucide-react";
+import { Globe, User, History, KeyRound, CreditCard } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
+import type { Plan } from "@/lib/stripe";
 
-export function SettingsContent() {
+type Props = {
+  currentPlan: Plan;
+};
+
+export function SettingsContent({ currentPlan }: Props) {
   const { t } = useTranslations();
+
+  const planLabel: Record<Plan, string> = {
+    free: t("settings.planFree"),
+    basic: t("settings.planBasic"),
+    premium: t("settings.planPremium"),
+  };
 
   return (
     <div className="container max-w-2xl pb-6 space-y-6">
       <h1 className="text-2xl font-bold">{t("settings.title")}</h1>
 
       <div className="space-y-4">
+        {/* サブスクリプションリンク */}
+        <Link href="/settings/billing" className="block">
+          <Card className="hover:bg-accent transition-colors cursor-pointer">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                {t("settings.subscription")}
+                <Badge variant="secondary" className="ml-auto text-xs font-normal">
+                  {planLabel[currentPlan]}
+                </Badge>
+              </CardTitle>
+              <CardDescription>{t("settings.subscriptionDescription")}</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
         {/* 外観設定リンク */}
         <Link href="/settings/appearance" className="block">
           <Card className="hover:bg-accent transition-colors cursor-pointer">

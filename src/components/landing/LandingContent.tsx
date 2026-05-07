@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { getStaticUrl } from "@/lib/utils/static-url";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslations } from "@/lib/i18n";
 import {
@@ -79,7 +80,7 @@ export function LandingContent() {
     <div className="flex flex-col">
       <section className="relative isolate min-h-[calc(72svh-4rem)] overflow-hidden px-4 py-10 md:min-h-[calc(88svh-4rem)] md:py-16">
         <Image
-          src="/landing-hero.png"
+          src={getStaticUrl("landing-hero.png")}
           alt=""
           fill
           priority

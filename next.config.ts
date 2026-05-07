@@ -5,6 +5,16 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
+const staticBaseUrl = process.env.NEXT_PUBLIC_STATIC_BASE_URL;
+let staticHostname: string | null = null;
+if (staticBaseUrl) {
+  try {
+    staticHostname = new URL(staticBaseUrl).hostname;
+  } catch {
+    // ignore invalid URL
+  }
+}
+
 const nextConfig: NextConfig = {
   output: "standalone",
   serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
@@ -24,8 +34,10 @@ const nextConfig: NextConfig = {
         hostname: "localhost",
         port: "9000",
       },
-      // 本番: Cloudflare R2 / カスタムドメイン (R2_PUBLIC_URL のホスト)
-      // 本番ホスト名を追加する場合はここに { protocol: "https", hostname: "..." } を追記
+      // 本番: NEXT_PUBLIC_STATIC_BASE_URL のホスト名を動的に追加
+      ...(staticHostname
+        ? [{ protocol: "https" as const, hostname: staticHostname }]
+        : []),
     ],
   },
   async headers() {

@@ -6,6 +6,7 @@ import type { ActionResult } from "@/lib/types/action-result";
 import { withAction, requireAuth, requireOwnership } from "@/lib/actions/action-helpers";
 import { ArticleIdSchema, ChangeNoteSchema, VersionIdSchema } from "../schema/article-schema";
 import type { ArticleVersion } from "@prisma/client";
+import { getUserPlan } from "@/lib/stripe/plan-gate";
 
 export async function createVersionAction(articleId: string, changeNote?: string): Promise<ActionResult<ArticleVersion>> {
   return withAction(async () => {
@@ -20,6 +21,11 @@ export async function createVersionAction(articleId: string, changeNote?: string
 
     const authResult = await requireAuth();
     if (!authResult.success) return authResult;
+
+    const { isPremium } = await getUserPlan(authResult.userId);
+    if (!isPremium) {
+      return { success: false, error: "バージョン履歴はPremiumプランの機能です。" };
+    }
 
     const article = await prisma.article.findUnique({
       where: { id: parsedArticleId.data },
@@ -110,6 +116,11 @@ export async function getArticleVersionsAction(articleId: string): Promise<Actio
 
     const authResult = await requireAuth();
     if (!authResult.success) return authResult;
+
+    const { isPremium } = await getUserPlan(authResult.userId);
+    if (!isPremium) {
+      return { success: false, error: "バージョン履歴はPremiumプランの機能です。" };
+    }
 
     const article = await prisma.article.findUnique({
       where: { id: parsedArticleId.data },

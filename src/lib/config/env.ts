@@ -48,6 +48,12 @@ const EnvSchema = z
     CRON_SECRET: optionalString(z.string().min(32)),
 
     NEXT_PUBLIC_APP_URL: optionalUrl(),
+
+    STRIPE_SECRET_KEY: optionalString(z.string().min(1)),
+    STRIPE_WEBHOOK_SECRET: optionalString(z.string().min(1)),
+    STRIPE_BASIC_PRICE_ID: optionalString(z.string().min(1)),
+    STRIPE_PREMIUM_PRICE_ID: optionalString(z.string().min(1)),
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: optionalString(z.string().min(1)),
   })
   .superRefine((v, ctx) => {
     const pairs: Array<[string, Array<string | undefined>]> = [

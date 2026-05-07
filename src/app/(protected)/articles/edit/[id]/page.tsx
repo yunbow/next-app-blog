@@ -6,6 +6,8 @@ import { VersionHistory } from "@/features/article/components/VersionHistory";
 import { BackLink } from "@/components/common/BackLink";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
+import { getUserPlan } from "@/lib/stripe/plan-gate";
+import { PlanUpgradePrompt } from "@/components/common/PlanUpgradePrompt";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -28,7 +30,7 @@ export default async function EditArticlePage({ params }: Props) {
     redirect("/dashboard");
   }
 
-  const [categories, images, versions] = await Promise.all([
+  const [categories, images, versions, { isPremium, isBasicOrAbove }] = await Promise.all([
     prisma.category.findMany({
       orderBy: { name: "asc" },
     }),
@@ -40,6 +42,7 @@ export default async function EditArticlePage({ params }: Props) {
       where: { articleId: article.id },
       orderBy: { version: "desc" },
     }),
+    getUserPlan(session.user.id),
   ]);
 
   const initialData = {
@@ -72,19 +75,32 @@ export default async function EditArticlePage({ params }: Props) {
                 articleId={article.id}
                 initialData={initialData}
                 categories={categories}
+                isPremium={isPremium}
+                isBasicOrAbove={isBasicOrAbove}
               />
             </CardContent>
           </Card>
         </div>
         <div className="lg:col-span-1">
-          <VersionHistory
-            articleId={article.id}
-            versions={versions}
-            currentVersion={{
-              title: article.title,
-              content: article.content,
-            }}
-          />
+          {isPremium ? (
+            <VersionHistory
+              articleId={article.id}
+              versions={versions}
+              currentVersion={{
+                title: article.title,
+                content: article.content,
+              }}
+            />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">バージョン履歴</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PlanUpgradePrompt feature="バージョン履歴" requiredPlan="premium" />
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

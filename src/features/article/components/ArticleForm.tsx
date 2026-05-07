@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Lock } from "lucide-react";
 import { MarkdownPreview } from "./MarkdownPreview";
 import { ImageUpload } from "./ImageUpload";
 import { createArticleAction, updateArticleAction } from "../server/article-actions";
@@ -40,9 +42,11 @@ type Props = {
     scheduledAt: string;
   };
   categories: Category[];
+  isPremium?: boolean;
+  isBasicOrAbove?: boolean;
 };
 
-export function ArticleForm({ mode, articleId, initialData, categories }: Props) {
+export function ArticleForm({ mode, articleId, initialData, categories, isPremium = false, isBasicOrAbove = false }: Props) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState(initialData?.title || "");
@@ -205,6 +209,49 @@ export function ArticleForm({ mode, articleId, initialData, categories }: Props)
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* スケジュール公開 (Premiumのみ) */}
+      {isPremium ? (
+        <div className="space-y-2">
+          <Label>スケジュール公開</Label>
+          <div className="flex items-center gap-2">
+            <Input
+              type="datetime-local"
+              value={scheduledAt}
+              onChange={(e) => setScheduledAt(e.target.value)}
+              className="w-auto"
+            />
+            {scheduledAt && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleSubmit("scheduled")}
+                disabled={isLoading || !title || !content}
+              >
+                予約する
+              </Button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Lock className="h-4 w-4" />
+          <span>スケジュール公開は</span>
+          <Link href="/settings/billing" className="underline text-foreground">
+            Premiumプラン
+          </Link>
+          <span>の機能です</span>
+        </div>
+      )}
+
+      {!isBasicOrAbove && (
+        <p className="text-xs text-muted-foreground">
+          フリープランでは月3件まで投稿できます。
+          <Link href="/settings/billing" className="underline ml-1">
+            プランをアップグレード
+          </Link>
+        </p>
+      )}
 
       <div className="flex items-center gap-4 justify-end">
         <Button

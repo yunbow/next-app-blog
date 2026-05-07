@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { getStaticUrl } from "@/lib/utils/static-url";
 
 type BrandLogoProps = {
   className?: string;
@@ -24,7 +25,7 @@ export function BrandLogo({
       aria-label={label}
     >
       <Image
-        src="/brand-icon.png"
+        src={getStaticUrl("brand-icon.png")}
         alt=""
         aria-hidden="true"
         width={64}

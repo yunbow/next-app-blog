@@ -6,6 +6,9 @@ import { generateSlug } from "../services/slug-utils";
 import { revalidatePath } from "next/cache";
 import type { ActionResult } from "@/lib/types/action-result";
 import { withAction, requireAuth, requireOwnership } from "@/lib/actions/action-helpers";
+import { getUserPlan } from "@/lib/stripe/plan-gate";
+
+const FREE_MONTHLY_ARTICLE_LIMIT = 3;
 
 export async function createArticleAction(data: unknown): Promise<ActionResult<{ id: string; slug: string }>> {
   return withAction(async () => {
@@ -18,6 +21,28 @@ export async function createArticleAction(data: unknown): Promise<ActionResult<{
     }
 
     const { title, content, excerpt, tags, categoryId, images, status, scheduledAt } = parsed.data;
+
+    const { plan, isPremium, isBasicOrAbove } = await getUserPlan(authResult.userId);
+
+    // フリープラン: 月3件制限
+    if (!isBasicOrAbove) {
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      const count = await prisma.article.count({
+        where: { authorId: authResult.userId, createdAt: { gte: startOfMonth } },
+      });
+      if (count >= FREE_MONTHLY_ARTICLE_LIMIT) {
+        return { success: false, error: `フリープランでは月${FREE_MONTHLY_ARTICLE_LIMIT}件まで投稿できます。Basicプランにアップグレードしてください。` };
+      }
+    }
+
+    // スケジュール公開: Premiumのみ
+    if (status === "scheduled" && !isPremium) {
+      return { success: false, error: "スケジュール公開はPremiumプランの機能です。" };
+    }
+
+    void plan;
 
     const slug = await generateSlug(title);
 
@@ -81,8 +106,15 @@ export async function updateArticleAction(articleId: string, data: unknown): Pro
 
     const { tags, images, categoryId, ...updateData } = parsed.data;
 
-    // バージョンを作成（重要な変更の場合）
-    if (updateData.title !== ownershipResult.resource.title || updateData.content !== ownershipResult.resource.content) {
+    const { isPremium } = await getUserPlan(authResult.userId);
+
+    // スケジュール公開: Premiumのみ
+    if (updateData.status === "scheduled" && !isPremium) {
+      return { success: false, error: "スケジュール公開はPremiumプランの機能です。" };
+    }
+
+    // バージョンを作成（重要な変更の場合）- Premiumのみ
+    if (isPremium && (updateData.title !== ownershipResult.resource.title || updateData.content !== ownershipResult.resource.content)) {
       const latestVersion = await prisma.articleVersion.findFirst({
         where: { articleId },
         orderBy: { version: "desc" },
