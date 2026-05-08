@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getUserBookmarks, getUserCollections } from "@/features/bookmark/services/bookmark-service";
 import { ArticleCard } from "@/features/article/components/ArticleCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -13,28 +13,8 @@ export default async function BookmarksPage() {
   }
 
   const [bookmarks, collections] = await Promise.all([
-    prisma.bookmark.findMany({
-      where: { userId: session.user.id },
-      include: {
-        article: {
-          include: {
-            author: { select: { id: true, name: true, image: true, username: true } },
-            category: { select: { id: true, name: true, slug: true } },
-            tags: { include: { tag: { select: { id: true, name: true } } } },
-            _count: { select: { comments: true, reactions: true } },
-          },
-        },
-        collection: true,
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.bookmarkCollection.findMany({
-      where: { userId: session.user.id },
-      include: {
-        _count: { select: { bookmarks: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
+    getUserBookmarks(session.user.id),
+    getUserCollections(session.user.id),
   ]);
 
   return (

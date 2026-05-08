@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState, useSyncExternalStore } from "react";
-import { useNotificationStream } from "@/features/notification/hooks/useNotificationStream";
+import { useNotificationStream } from "@/lib/hooks/useNotificationStream";
 import { getImageUrl } from "@/lib/utils/image-url";
 import { BrandLogo } from "@/components/common/BrandLogo";
 import {

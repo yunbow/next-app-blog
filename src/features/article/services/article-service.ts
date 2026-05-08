@@ -137,3 +137,17 @@ export async function getUserArticles(
 export async function getUserDrafts(userId: string) {
   return getUserArticles(userId, { status: "draft" });
 }
+
+export async function getArticleImages(articleId: string) {
+  return prisma.articleImage.findMany({
+    where: { articleId },
+    orderBy: { order: "asc" },
+  });
+}
+
+export async function getArticleVersions(articleId: string) {
+  return prisma.articleVersion.findMany({
+    where: { articleId },
+    orderBy: { version: "desc" },
+  });
+}

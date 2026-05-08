@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import { useNotificationStream } from "@/features/notification/hooks/useNotificationStream";
+import { useNotificationStream } from "@/lib/hooks/useNotificationStream";
 import { useTranslations } from "@/lib/i18n";
 import {
   DashboardIcon,

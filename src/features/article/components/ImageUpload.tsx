@@ -55,8 +55,8 @@ export function ImageUpload({ images, onChange }: Props) {
       }
 
       toast.success("画像をアップロードしました");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "アップロードに失敗しました");
+    } catch {
+      toast.error("アップロードに失敗しました");
     } finally {
       setIsUploading(false);
     }

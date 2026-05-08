@@ -14,7 +14,10 @@ export const CreateArticleSchema = z.object({
   categoryId: z.string().optional(),
   images: z.array(ArticleImageSchema).optional(),
   status: z.enum(["draft", "published", "scheduled"]).default("draft"),
-  scheduledAt: z.string().optional(),
+  scheduledAt: z.string().optional().refine(
+    (val) => !val || new Date(val) > new Date(),
+    { message: "公開日時は未来の日時を指定してください" }
+  ),
 });
 
 export const UpdateArticleSchema = CreateArticleSchema.partial();

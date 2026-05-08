@@ -41,3 +41,24 @@ export async function isFollowing(followerId: string, followingId: string) {
   });
   return !!follow;
 }
+
+export async function getUserProfile(id: string) {
+  return prisma.user.findUnique({
+    where: { id },
+    select: { name: true, username: true, bio: true, image: true },
+  });
+}
+
+export async function getUserBillingInfo(id: string) {
+  return prisma.user.findUnique({
+    where: { id },
+    select: { stripePriceId: true, subscriptionStatus: true, currentPeriodEnd: true },
+  });
+}
+
+export async function getUserPlanInfo(id: string) {
+  return prisma.user.findUnique({
+    where: { id },
+    select: { stripePriceId: true, subscriptionStatus: true },
+  });
+}

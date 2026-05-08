@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getCollectionById } from "@/features/bookmark/services/bookmark-service";
 import { CollectionForm } from "@/features/bookmark/components/CollectionForm";
 import { BackLink } from "@/components/common/BackLink";
 
@@ -15,10 +15,7 @@ export default async function EditCollectionPage({ params }: Props) {
   }
 
   const { id } = await params;
-
-  const collection = await prisma.bookmarkCollection.findUnique({
-    where: { id },
-  });
+  const collection = await getCollectionById(id);
 
   if (!collection) {
     notFound();

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getUserBillingInfo } from "@/features/user/services/user-service";
 import { getPlanFromPriceId } from "@/lib/stripe";
 import { BillingContent } from "@/features/settings/components/BillingContent";
 import { BackLink } from "@/components/common/BackLink";
@@ -31,15 +31,7 @@ export default async function BillingPage() {
     );
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      stripePriceId: true,
-      subscriptionStatus: true,
-      currentPeriodEnd: true,
-    },
-  });
-
+  const user = await getUserBillingInfo(session.user.id);
   const currentPlan = getPlanFromPriceId(user?.stripePriceId);
 
   return (

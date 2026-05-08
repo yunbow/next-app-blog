@@ -7,6 +7,10 @@ vi.mock("@/lib/auth", () => ({
   auth: vi.fn(),
 }));
 
+vi.mock("@/lib/stripe/plan-gate", () => ({
+  getUserPlan: vi.fn().mockResolvedValue({ plan: "basic", isPremium: false, isBasicOrAbove: true }),
+}));
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     article: {

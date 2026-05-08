@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { ArticleForm } from "@/features/article/components/ArticleForm";
 import { BackLink } from "@/components/common/BackLink";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { prisma } from "@/lib/prisma";
+import { getAllCategories } from "@/features/category/services/category-service";
 import { getUserPlan } from "@/lib/stripe/plan-gate";
 
 export default async function NewArticlePage() {
@@ -11,7 +11,7 @@ export default async function NewArticlePage() {
   if (!session?.user?.id) redirect("/login");
 
   const [categories, { isPremium, isBasicOrAbove }] = await Promise.all([
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    getAllCategories(),
     getUserPlan(session.user.id),
   ]);
 

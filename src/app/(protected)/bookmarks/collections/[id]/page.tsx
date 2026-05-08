@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getCollectionWithBookmarks } from "@/features/bookmark/services/bookmark-service";
 import { ArticleCard } from "@/features/article/components/ArticleCard";
 import { BackLink } from "@/components/common/BackLink";
 import { Button } from "@/components/ui/button";
@@ -18,32 +18,12 @@ export default async function CollectionDetailPage({ params }: Props) {
   }
 
   const { id } = await params;
-
-  const collection = await prisma.bookmarkCollection.findUnique({
-    where: { id },
-    include: {
-      bookmarks: {
-        include: {
-          article: {
-            include: {
-              author: { select: { id: true, name: true, image: true, username: true } },
-              category: { select: { id: true, name: true, slug: true } },
-              tags: { include: { tag: { select: { id: true, name: true } } } },
-              _count: { select: { comments: true, reactions: true } },
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-      },
-      _count: { select: { bookmarks: true } },
-    },
-  });
+  const collection = await getCollectionWithBookmarks(id);
 
   if (!collection) {
     notFound();
   }
 
-  // Check if user owns this collection or if it's public
   if (collection.userId !== session.user.id && !collection.isPublic) {
     redirect("/bookmarks");
   }
@@ -71,7 +51,7 @@ export default async function CollectionDetailPage({ params }: Props) {
                 編集
               </Button>
             </Link>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" aria-label="コレクションを削除">
               <Trash2 className="h-4 w-4 mr-2" />
               削除
             </Button>

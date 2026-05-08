@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
-import { join } from "path";
+import { resolve, sep } from "path";
 import { logger } from "@/lib/logger";
 
 export async function GET(
@@ -12,14 +12,13 @@ export async function GET(
     
     // パスを結合
     const imagePath = path.join("/");
-    
-    // セキュリティ: パストラバーサル攻撃を防ぐ
-    if (imagePath.includes("..") || imagePath.includes("~")) {
+
+    // セキュリティ: path.resolve() でパストラバーサル攻撃を防ぐ
+    const baseDir = resolve(process.cwd(), "public", "uploads");
+    const filePath = resolve(baseDir, imagePath);
+    if (!filePath.startsWith(baseDir + sep) && filePath !== baseDir) {
       return new NextResponse("Invalid path", { status: 400 });
     }
-
-    // 画像ファイルのパスを構築
-    const filePath = join(process.cwd(), "public", "uploads", imagePath);
 
     // ファイルを読み込む
     const fileBuffer = await readFile(filePath);

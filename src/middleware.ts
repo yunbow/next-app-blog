@@ -80,8 +80,8 @@ export default auth(async function middleware(request) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: 'unsafe-inline';
-    style-src 'self' 'unsafe-inline';
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https:;
+    style-src 'self' 'nonce-${nonce}';
     ${process.env.NODE_ENV === "development" ? "img-src 'self' blob: data: https: http://localhost:9000;" : "img-src 'self' blob: data: https:;"}
     font-src 'self';
     object-src 'none';

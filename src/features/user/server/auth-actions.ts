@@ -3,11 +3,22 @@
 import { prisma } from "@/lib/prisma";
 import { signIn } from "@/lib/auth";
 import bcrypt from "bcryptjs";
+import { headers } from "next/headers";
 import { RegisterSchema, LoginSchema } from "../schema/auth-schema";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
 import { logger } from "@/lib/logger";
 import type { ActionResult } from "@/lib/types/action-result";
 import { withAction } from "@/lib/actions/action-helpers";
+
+async function getRequestIp(): Promise<string> {
+  const h = await headers();
+  return (
+    h.get("x-real-ip") ??
+    h.get("cf-connecting-ip") ??
+    h.get("x-forwarded-for")?.split(",")[0].trim() ??
+    "unknown"
+  );
+}
 
 function generateUsername(): string {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -40,16 +51,17 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
       return { success: false, error: parsed.error.issues[0].message };
     }
 
+    const ip = await getRequestIp();
     const rateLimitResult = await checkRateLimit(
-      `register:${parsed.data.email}`,
+      `register:${ip}`,
       RATE_LIMITS.register.limit,
       RATE_LIMITS.register.windowMs
     );
 
     if (!rateLimitResult.success) {
       logger.warn(
-        { email: parsed.data.email, resetAt: new Date(rateLimitResult.resetAt) },
-        `Rate limit exceeded for register: ${parsed.data.email}`
+        { ip, resetAt: new Date(rateLimitResult.resetAt) },
+        "Rate limit exceeded for register"
       );
       return {
         success: false,
@@ -91,16 +103,17 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
       return { success: false, error: parsed.error.issues[0].message };
     }
 
+    const ip = await getRequestIp();
     const rateLimitResult = await checkRateLimit(
-      `login:${parsed.data.email}`,
+      `login:${ip}`,
       RATE_LIMITS.login.limit,
       RATE_LIMITS.login.windowMs
     );
 
     if (!rateLimitResult.success) {
       logger.warn(
-        { email: parsed.data.email, resetAt: new Date(rateLimitResult.resetAt) },
-        `Rate limit exceeded for login: ${parsed.data.email}`
+        { ip, resetAt: new Date(rateLimitResult.resetAt) },
+        "Rate limit exceeded for login"
       );
       return {
         success: false,

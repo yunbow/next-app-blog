@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,6 +24,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     event = getStripe().webhooks.constructEvent(body, signature, webhookSecret);
   } catch {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  }
+
+  const alreadyProcessed = await prisma.processedWebhookEvent.findUnique({
+    where: { id: event.id },
+  });
+  if (alreadyProcessed) {
+    return NextResponse.json({ received: true });
   }
 
   try {
@@ -96,8 +104,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         break;
       }
     }
+
+    await prisma.processedWebhookEvent.create({ data: { id: event.id } });
   } catch (error) {
-    console.error("Webhook handler error:", error);
+    logger.error({ error }, "Webhook handler error");
     return NextResponse.json({ error: "Handler failed" }, { status: 500 });
   }
 

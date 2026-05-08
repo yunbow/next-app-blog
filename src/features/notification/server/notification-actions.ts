@@ -9,13 +9,13 @@ import { NotificationIdSchema } from "../schema/notification-schema";
 
 export async function markAsReadAction(notificationId: string): Promise<ActionResult> {
   return withAction(async () => {
+    const authResult = await requireAuth();
+    if (!authResult.success) return authResult;
+
     const parsedId = NotificationIdSchema.safeParse(notificationId);
     if (!parsedId.success) {
       return { success: false, error: parsedId.error.issues[0].message };
     }
-
-    const authResult = await requireAuth();
-    if (!authResult.success) return authResult;
 
     // IDOR対策: 通知の所有者確認
     const notification = await prisma.notification.findUnique({

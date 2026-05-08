@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTransition } from "react";
 import { Check } from "lucide-react";
-import { createCheckoutSession, switchPlan, cancelSubscription } from "@/features/settings/actions/subscription";
+import { createCheckoutSession, switchPlan, cancelSubscription } from "@/features/settings/server/subscription-actions";
 import type { Plan } from "@/lib/stripe";
 
 type Props = {

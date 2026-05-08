@@ -1,8 +1,12 @@
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getArticleBySlug } from "@/features/article/services/article-service";
-import { prisma } from "@/lib/prisma";
 import { getReactionStats, getUserReactions } from "@/features/reaction/server/reaction-actions";
+import { getArticleComments } from "@/features/comment/services/comment-service";
+import {
+  getUserBookmarkForArticle,
+  getUserCollectionList,
+} from "@/features/bookmark/services/bookmark-service";
 import { ArticleContent } from "@/features/article/components/ArticleContent";
 import { CommentSection } from "@/features/comment/components/CommentSection";
 import { ReactionPicker } from "@/features/reaction/components/ReactionPicker";
@@ -34,40 +38,17 @@ export default async function ArticleDetailPage({ params }: Props) {
     notFound();
   }
 
+  const userId = session?.user?.id;
+
   const [reactionStats, userReactions, comments, bookmarkData, collections] = await Promise.all([
     getReactionStats(article.id),
-    session?.user?.id ? getUserReactions(article.id, session.user.id) : Promise.resolve([]),
-    prisma.comment.findMany({
-      where: { articleId: article.id },
-      orderBy: { createdAt: "asc" },
-      include: {
-        author: { select: { id: true, name: true, image: true, username: true } },
-      },
-    }),
-    session?.user?.id
-      ? prisma.bookmark.findUnique({
-          where: {
-            userId_articleId: {
-              userId: session.user.id,
-              articleId: article.id,
-            },
-          },
-          select: {
-            id: true,
-            collectionId: true,
-          },
-        })
-      : Promise.resolve(null),
-    session?.user?.id
-      ? prisma.bookmarkCollection.findMany({
-          where: { userId: session.user.id },
-          select: { id: true, name: true },
-          orderBy: { name: "asc" },
-        })
-      : Promise.resolve([]),
+    userId ? getUserReactions(article.id, userId) : Promise.resolve([]),
+    getArticleComments(article.id),
+    userId ? getUserBookmarkForArticle(userId, article.id) : Promise.resolve(null),
+    userId ? getUserCollectionList(userId) : Promise.resolve([]),
   ]);
 
-  const isAuthor = session?.user?.id === article.authorId;
+  const isAuthor = userId === article.authorId;
 
   return (
     <div className="container max-w-3xl pb-8">
@@ -139,8 +120,8 @@ export default async function ArticleDetailPage({ params }: Props) {
         />
         <div className="flex items-center gap-2">
           {session?.user && (
-            <BookmarkButton 
-              articleId={article.id} 
+            <BookmarkButton
+              articleId={article.id}
               isBookmarked={!!bookmarkData}
               bookmarkId={bookmarkData?.id}
               currentCollectionId={bookmarkData?.collectionId}

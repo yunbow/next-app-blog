@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -93,9 +94,7 @@ export async function GET() {
   } as const;
 
   if (!allOk) {
-    // logger が無いアプリ (todo) でも動作するよう console を使う。
-    // eslint-disable-next-line no-console
-    console.error("[health] degraded", body);
+    logger.error(body, "[health] degraded");
   }
 
   return NextResponse.json(body, { status: allOk ? 200 : 503 });

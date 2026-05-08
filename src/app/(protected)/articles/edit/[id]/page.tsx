@@ -1,11 +1,11 @@
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { getArticleById } from "@/features/article/services/article-service";
+import { getArticleById, getArticleImages, getArticleVersions } from "@/features/article/services/article-service";
+import { getAllCategories } from "@/features/category/services/category-service";
 import { ArticleForm } from "@/features/article/components/ArticleForm";
 import { VersionHistory } from "@/features/article/components/VersionHistory";
 import { BackLink } from "@/components/common/BackLink";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { prisma } from "@/lib/prisma";
 import { getUserPlan } from "@/lib/stripe/plan-gate";
 import { PlanUpgradePrompt } from "@/components/common/PlanUpgradePrompt";
 
@@ -31,17 +31,9 @@ export default async function EditArticlePage({ params }: Props) {
   }
 
   const [categories, images, versions, { isPremium, isBasicOrAbove }] = await Promise.all([
-    prisma.category.findMany({
-      orderBy: { name: "asc" },
-    }),
-    prisma.articleImage.findMany({
-      where: { articleId: article.id },
-      orderBy: { order: "asc" },
-    }),
-    prisma.articleVersion.findMany({
-      where: { articleId: article.id },
-      orderBy: { version: "desc" },
-    }),
+    getAllCategories(),
+    getArticleImages(article.id),
+    getArticleVersions(article.id),
     getUserPlan(session.user.id),
   ]);
 

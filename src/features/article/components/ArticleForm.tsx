@@ -14,6 +14,7 @@ import { Lock } from "lucide-react";
 import { MarkdownPreview } from "./MarkdownPreview";
 import { ImageUpload } from "./ImageUpload";
 import { createArticleAction, updateArticleAction } from "../server/article-actions";
+import { CreateArticleSchema, UpdateArticleSchema } from "../schema/article-schema";
 import { toast } from "sonner";
 
 type Category = {
@@ -91,6 +92,14 @@ export function ArticleForm({ mode, articleId, initialData, categories, isPremiu
       status: submitStatus,
       scheduledAt: submitStatus === "scheduled" ? scheduledAt : undefined,
     };
+
+    const schema = mode === "create" ? CreateArticleSchema : UpdateArticleSchema;
+    const parsed = schema.safeParse(data);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0].message);
+      setIsLoading(false);
+      return;
+    }
 
     const result = mode === "create"
       ? await createArticleAction(data)

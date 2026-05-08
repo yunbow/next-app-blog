@@ -319,6 +319,15 @@ model LoginHistory {
   @@map("login_histories")
 }
 
+// ==================== Stripe Webhook Idempotency ====================
+
+model ProcessedWebhookEvent {
+  id          String   @id
+  processedAt DateTime @default(now())
+
+  @@map("processed_webhook_events")
+}
+
 // ==================== Article Versions ====================
 
 model ArticleVersion {

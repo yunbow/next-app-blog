@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { createCollectionAction, updateCollectionAction } from "../server/collection-actions";
+import { z } from "zod";
+import { CreateCollectionSchema, type CreateCollectionInput } from "../schema/bookmark-schema";
+
+type FormValues = z.input<typeof CreateCollectionSchema>;
 
 type Props = {
   mode: "create" | "edit";
@@ -22,20 +27,28 @@ type Props = {
 
 export function CollectionForm({ mode, collectionId, initialData }: Props) {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    name: initialData?.name || "",
-    description: initialData?.description || "",
-    isPublic: initialData?.isPublic || false,
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues, unknown, CreateCollectionInput>({
+    resolver: zodResolver(CreateCollectionSchema),
+    defaultValues: {
+      name: initialData?.name ?? "",
+      description: initialData?.description ?? "",
+      isPublic: initialData?.isPublic ?? false,
+    },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const isPublic = watch("isPublic");
 
-    const result = mode === "create"
-      ? await createCollectionAction(formData)
-      : await updateCollectionAction(collectionId!, formData);
+  const onSubmit = async (data: CreateCollectionInput) => {
+    const result =
+      mode === "create"
+        ? await createCollectionAction(data)
+        : await updateCollectionAction(collectionId!, data);
 
     if (result.success) {
       toast.success(mode === "create" ? "コレクションを作成しました" : "コレクションを更新しました");
@@ -44,33 +57,33 @@ export function CollectionForm({ mode, collectionId, initialData }: Props) {
     } else {
       toast.error(result.error);
     }
-    setIsSubmitting(false);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="name">コレクション名</Label>
         <Input
           id="name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          {...register("name")}
           placeholder="例: お気に入りの技術記事"
-          required
-          maxLength={100}
         />
+        {errors.name && (
+          <p className="text-sm text-destructive">{errors.name.message}</p>
+        )}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="description">説明（任意）</Label>
         <Textarea
           id="description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          {...register("description")}
           placeholder="このコレクションについて..."
           rows={3}
-          maxLength={500}
         />
+        {errors.description && (
+          <p className="text-sm text-destructive">{errors.description.message}</p>
+        )}
       </div>
 
       <div className="flex items-center justify-between">
@@ -82,8 +95,8 @@ export function CollectionForm({ mode, collectionId, initialData }: Props) {
         </div>
         <Switch
           id="isPublic"
-          checked={formData.isPublic}
-          onCheckedChange={(checked) => setFormData({ ...formData, isPublic: checked })}
+          checked={isPublic}
+          onCheckedChange={(checked) => setValue("isPublic", checked)}
         />
       </div>
 
