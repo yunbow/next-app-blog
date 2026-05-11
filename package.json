@@ -92,7 +92,7 @@
     "@types/react-dom": "^19",
     "@types/rss": "^0.0.32",
     "@vitejs/plugin-react": "^5.1.4",
-    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/coverage-v8": "^4.1.5",
     "eslint": "^9",
     "eslint-config-next": "^16.0.8",
     "jsdom": "^28.1.0",
